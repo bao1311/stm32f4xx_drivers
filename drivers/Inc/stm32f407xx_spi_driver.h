@@ -24,13 +24,13 @@ typedef struct {
 /*
  * @SPI_SSM
  */
-#define SPI_SSM_HW 			0
-#define SPI_SSM_SW 			1
+#define SPI_SSM_DI 			0
+#define SPI_SSM_EN 			1
 /*
  * @SPI_CPHA
  */
-#define SPI_CPHA_EN			1
-#define SPI_CPHA_DI			0
+#define SPI_CPHA_HIGH			1
+#define SPI_CPHA_LOW			0
 
 /*
  * @SPI_CPOL

@@ -11,6 +11,8 @@
 
 void SPI_Init(SPI_Handle_t* pSPIHandle)
 {
+	// 0. Enable SPI Peripheral clock
+	SPI_PeriClockControl(pSPIHandle->pSPIx, ENABLE);
 	uint32_t tempreg = 0;
 	// 1. Configure the device mode
 	tempreg |= pSPIHandle->SPIConfig.SPI_DeviceMode << SPI_CR1_MSTR;
