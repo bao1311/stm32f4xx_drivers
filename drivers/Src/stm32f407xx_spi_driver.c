@@ -123,9 +123,28 @@ uint8_t SPI_GetFlagStatus(SPI_RegDef_t* pSPIx, uint8_t FlagName)
 	return FLAG_RESET;
 
 }
-/*
- * API for SPI Data Send
+
+/******************************************
+ * @fn			- SPI_PeripheralControl
+ *
+ * @brief		- This function enable SPI, no more change in configuration from here
+ * @param[in]	- SPI1, 2 or 3
+ * @param[in]	- Enable or Disable variable
+ *
+ * @return
  */
+void SPI_PeripheralControl(SPI_RegDef_t* pSPIx, uint8_t EnorDi)
+{
+	if (EnorDi == ENABLE)
+	{
+		pSPIx->CR1 |= (1 << SPI_CR1_SPE);
+	}
+	else
+	{
+		pSPIx->CR1 &= ~(1 << SPI_CR1_SPE);
+	}
+
+}
 
 /******************************************
  * @fn			- SPI_SendData
@@ -137,6 +156,9 @@ uint8_t SPI_GetFlagStatus(SPI_RegDef_t* pSPIx, uint8_t FlagName)
  *
  * @return
  * @Note:	This is a blocking call
+ */
+/*
+ * API for SPI Data Send
  */
 void SPI_SendData(SPI_RegDef_t* pSPIx, uint8_t* pTxBuffer, uint32_t Len)
 {

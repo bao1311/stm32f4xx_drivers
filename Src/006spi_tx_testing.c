@@ -80,6 +80,7 @@ int main(void)
 	SPI2_GPIOInits();
 	SPI2_Inits();
 	// Send data
+	SPI_PeripheralControl(SPI2, ENABLE);
 	SPI_SendData(SPI2, user_data, strlen(user_data));
 	printf("Hello world");
 

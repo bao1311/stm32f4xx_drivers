@@ -130,6 +130,8 @@ void SPI_DeInit(SPI_RegDef_t* pSPIx);
  */
 
 void SPI_PeriClockControl(SPI_RegDef_t* pSPIx, uint8_t EnorDi);
+void SPI_PeripheralControl(SPI_RegDef_t* pSPIx, uint8_t EnorDi);
+
 
 /*
  * Data send and receive
