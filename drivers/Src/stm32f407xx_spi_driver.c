@@ -175,7 +175,7 @@ void SPI_SendData(SPI_RegDef_t* pSPIx, uint8_t* pTxBuffer, uint32_t Len)
 			pSPIx->DR = *((uint16_t*) pTxBuffer);
 			--Len;
 			--Len;
-			(uint16_t*)pTxBuffer++;
+			((uint16_t*)pTxBuffer)++;
 		}
 		else
 		{
@@ -190,7 +190,33 @@ void SPI_SendData(SPI_RegDef_t* pSPIx, uint8_t* pTxBuffer, uint32_t Len)
 
 }
 
-void SPI_ReceiveData(SPI_RegDef_t* pSPIx, uint8_t pRxBuffer, uint32_t Len);
+void SPI_ReceiveData(SPI_RegDef_t* pSPIx, uint8_t pRxBuffer, uint32_t Len)
+{
+	// 1. Check if there is still data to receive
+	while (Len > 0)
+	{
+		// 2. Wait until RXNE is set (Receive buffer is not empty)
+		while (SPI_GetFlagStatus(pSPIx, 1 << SPI_SR_RXNE) == FLAG_SET);
+		if (pSPIx->CR1 & (1 << SPI_CR1_DFF))
+		{
+			// DFF == 1bit => transfer 16 bits at a time
+			*pRxBuffer = *((uint16_t*)pSPIx->DR);
+			((uint16_t*)pRxBuffer)++;
+			--Len;
+			--Len;
+
+		}
+		else
+		{
+			// bit DFF == 0 => Transfer 8 bits at a time
+			*pRxBuffer = *(pSPIx->DR);
+			pRxBuffer++;
+			Len--;
+
+		}
+	}
+
+}
 
 
 /*
