@@ -145,6 +145,12 @@ void SPI_ReceiveData(SPI_RegDef_t* pSPIx, uint8_t* pRxBuffer, uint32_t Len);
  */
 void SPI_SendDataIT(SPI_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len);
 void SPI_ReceiveDataIT(SPI_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len);
+/*
+ * SPI Application States Macros
+ */
+#define SPI_READY				0
+#define SPI_BUSY_IN_RX			1
+#define SPI_BUSY_IN_TX			2
 
 
 /*
