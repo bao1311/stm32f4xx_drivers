@@ -218,6 +218,24 @@ void SPI_ReceiveData(SPI_RegDef_t* pSPIx, uint8_t* pRxBuffer, uint32_t Len)
 
 }
 
+/*
+ * Data send and receive (Interrupt version)
+ */
+void SPI_SendDataIT(SPI_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len)
+{
+	// 1. Save pTxBuffer address and Len information in some global info
+
+
+	// 2. Mark the SPI state as busy in transmission so that no
+	// other code can take over same SPI peripheral until transmission is over
+
+	// 3. Enable TXEIE control bit to get the interrupt whenever
+	// TXE flag is set in SR
+
+	// 4. Data Transmission will be handled by ISR code (implement later)
+
+}
+void SPI_ReceiveDataIT(SPI_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len);
 
 /*
  * IRQ Configuration and ISR Handling
