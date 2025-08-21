@@ -134,11 +134,17 @@ void SPI_PeripheralControl(SPI_RegDef_t* pSPIx, uint8_t EnorDi);
 
 
 /*
- * Data send and receive
+ * Data send and receive (Blocking version)
  */
 void SPI_SendData(SPI_RegDef_t* pSPIx, uint8_t* pTxBuffer, uint32_t Len);
-
 void SPI_ReceiveData(SPI_RegDef_t* pSPIx, uint8_t* pRxBuffer, uint32_t Len);
+
+
+/*
+ * Data send and receive (Interrupt version)
+ */
+void SPI_SendDataIT(SPI_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len);
+void SPI_ReceiveDataIT(SPI_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len);
 
 
 /*
