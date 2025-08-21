@@ -274,7 +274,32 @@ uint8_t SPI_ReceiveDataIT(SPI_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Le
  */
 void SPI_IRQPriorityHandling(uint8_t IRQNumber, uint8_t IRQPriority);
 void SPI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi);
-void SPI_IRQHandling(SPI_Handle_t* pHandle);
+void SPI_IRQHandling(SPI_Handle_t* pHandle)
+{
+	// 1. Finding the root cause of the interrupt first
+	uint32_t temp1, temp2;
+	// 2. Check if root cause of interrupt is due to TXE
+	temp1 = pHandle->pSPIx->CR2 & (1 << SPI_CR2_TXEIE);
+	temp2 = pHandle->pSPIx->SR & (1 << SPI_SR_TXE);
+	if (temp1 && temp2)
+	{
+		spi_txe_handle();
+	}
+	// 3. Check if root cause of interrupt is due to RXE
+	temp1 = pHandle->pSPIx->CR2 & (1 << SPI_CR2_RXNEIE);
+	temp2 = pHandle->pSPIx->SR & (1 << SPI_SR_RXNE);
+	if (temp1 && temp2)
+	{
+		spi_rxne_handle();
+	}
+	// 4. Check if root cause of interrupt is due to overrun error
+	temp1 = pHandle->pSPIx->CR2 & (1 << SPI_CR2_ERRIE);
+	temp2 = pHandle->pSPIx->SR & (1 << SPI_SR_OVR);
+	if (temp1 && temp2)
+	{
+		spi_ovr_handle();
+	}
+}
 
 
 
