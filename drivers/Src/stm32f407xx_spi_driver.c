@@ -269,6 +269,10 @@ uint8_t SPI_ReceiveDataIT(SPI_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Le
 	return pHandle->RxState;
 }
 
+static void spi_txe_interrupt_handle(SPI_Handle_t* pHandle);
+static void spi_rxne_interrupt_handle(SPI_Handle_t* pHandle);
+static void spi_ovr_interrupt_handle(SPI_Handle_t* pHandle);
+
 /*
  * IRQ Configuration and ISR Handling
  */
@@ -283,24 +287,63 @@ void SPI_IRQHandling(SPI_Handle_t* pHandle)
 	temp2 = pHandle->pSPIx->SR & (1 << SPI_SR_TXE);
 	if (temp1 && temp2)
 	{
-		spi_txe_handle();
+		spi_txe_interrupt_handle(pHandle);
 	}
 	// 3. Check if root cause of interrupt is due to RXE
 	temp1 = pHandle->pSPIx->CR2 & (1 << SPI_CR2_RXNEIE);
 	temp2 = pHandle->pSPIx->SR & (1 << SPI_SR_RXNE);
 	if (temp1 && temp2)
 	{
-		spi_rxne_handle();
+		spi_rxne_interrupt_handle(pHandle);
 	}
 	// 4. Check if root cause of interrupt is due to overrun error
 	temp1 = pHandle->pSPIx->CR2 & (1 << SPI_CR2_ERRIE);
 	temp2 = pHandle->pSPIx->SR & (1 << SPI_SR_OVR);
 	if (temp1 && temp2)
 	{
-		spi_ovr_handle();
+		spi_ovr_interrupt_handle(pHandle);
 	}
 }
 
+/*
+ * Some helper functions for SPI driver code
+ */
+
+static void spi_txe_interrupt_handle(SPI_Handle_t* pHandle)
+{
+	if (pHandle->TxLen > 0)
+	{
+		uint32_t CR1 = pHandle->pSPIx->CR1;
+		if (CR1 & (1 << SPI_CR1_DFF))
+		{
+			// DFF bit == 1 which means the data is
+			// transfered 16 bits at a time
+			pHandle->pSPIx->DR = *((uint16_t*)pHandle->pTxBuffer);
+			pHandle->TxLen -= 2;
+			(uint16_t*)pHandle->pTxBuffer++;
+		}
+		else
+		{
+			// DFF bit == 0 which means the data is transferred
+			// 8 bits at a time
+			pHandle->pSPIx->DR = *(pHandle->pTxBuffer);
+			pHandle->TxLen -= 1;
+			pHandle->pTxBuffer++;
+		}
+	}
+	if (pHandle->TxLen == 0)
+	{
+		pHandle->pSPIx->CR2 &= ~(1 << SPI_CR2_TXEIE);
+		pHandle->pTxBuffer = NULL;
+		pHandle->TxState = SPI_READY;
+		pHandle->TxLen = 0;
+		SPI_ApplicationEventCallback(pHandle,SPI_EVENT_TX_CMPLT);
+
+
+	}
+}
+static void spi_rxne_interrupt_handle(SPI_Handle_t* pHandle);
+static void spi_ovr_interrupt_handle(SPI_Handle_t* pHandle);
 
 
 #endif /* SRC_STM32F407XX_SPI_DRIVER_C_ */

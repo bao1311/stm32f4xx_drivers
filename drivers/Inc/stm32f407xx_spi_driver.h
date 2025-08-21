@@ -22,6 +22,13 @@ typedef struct {
 } SPI_Config_t;
 
 /*
+ * @SPI callback status
+ */
+#define SPI_EVENT_TX_CMPLT		1
+#define SPI_EVENT_RX_CMPLT		2
+#define SPI_EVENT_OVR_ERR		3
+#define SPI_EVENT_CRC_ERR		4
+/*
  * @SPI_SSM
  */
 #define SPI_SSM_DI 			0
