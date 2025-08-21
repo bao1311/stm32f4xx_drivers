@@ -221,7 +221,7 @@ void SPI_ReceiveData(SPI_RegDef_t* pSPIx, uint8_t* pRxBuffer, uint32_t Len)
 /*
  * Data send and receive (Interrupt version)
  */
-void SPI_SendDataIT(SPI_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len)
+uint8_t SPI_SendDataIT(SPI_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len)
 {
 	if (pHandle->TxState != SPI_BUSY_IN_TX)
 	{
@@ -245,7 +245,29 @@ void SPI_SendDataIT(SPI_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len)
 	return pHandle->TxState;
 
 }
-void SPI_ReceiveDataIT(SPI_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len);
+uint8_t SPI_ReceiveDataIT(SPI_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len)
+{
+	if (pHandle->RxState != SPI_BUSY_IN_RX)
+	{
+
+		// 1. Save pRxBuffer address and Len information in some global info
+
+		pHandle->pRxBuffer = pRxBuffer;
+		pHandle->RxLen = Len;
+
+		// 2. Mark the SPI state as busy in transmission so that no
+		// other code can take over same SPI peripheral until transmission is over
+		pHandle->RxState = SPI_BUSY_IN_RX;
+
+		// 3. Enable RXEIE control bit to get the interrupt whenever
+		// RXE flag is set in SR
+		pHandle->pSPIx->CR2 |= (1 << SPI_CR2_RXNEIE);
+
+		// 4. Data Transmission will be handled by ISR code (implement later)
+
+	}
+	return pHandle->RxState;
+}
 
 /*
  * IRQ Configuration and ISR Handling

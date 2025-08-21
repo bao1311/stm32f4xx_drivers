@@ -81,7 +81,7 @@ int main(void)
 	SPI2_Inits();
 	// Send data
 	SPI_PeripheralControl(SPI2, ENABLE);
-	SPI_SendData(SPI2, user_data, strlen(user_data));
+	SPI_SendData(SPI2, (uint8_t*)user_data, strlen(user_data));
 	printf("Hello world");
 
 	while(1);

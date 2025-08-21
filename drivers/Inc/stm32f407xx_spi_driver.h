@@ -85,8 +85,8 @@ typedef struct {
 typedef struct {
 	SPI_RegDef_t* pSPIx;		/*|< This holds the base address of SPIx(x:0,1,2) peripheral >*/
 	SPI_Config_t SPIConfig;
-	uint8_t pTxBuffer;			/* !< To store the app. TxBuffer address > */
-	uint8_t pRxBuffer;			/* !< To store the app. RxBuffer address > */
+	uint8_t* pTxBuffer;			/* !< To store the app. TxBuffer address > */
+	uint8_t* pRxBuffer;			/* !< To store the app. RxBuffer address > */
 	uint32_t TxLen;				/* !< To store TxBuffer Len > */
 	uint32_t RxLen;				/* !< To store RxBuffer Len > */
 	uint8_t TxState;			/* !< To store TxBuffer State > */
@@ -149,8 +149,8 @@ void SPI_ReceiveData(SPI_RegDef_t* pSPIx, uint8_t* pRxBuffer, uint32_t Len);
 /*
  * Data send and receive (Interrupt version)
  */
-void SPI_SendDataIT(SPI_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len);
-void SPI_ReceiveDataIT(SPI_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len);
+uint8_t SPI_SendDataIT(SPI_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len);
+uint8_t SPI_ReceiveDataIT(SPI_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len);
 /*
  * SPI Application States Macros
  */
