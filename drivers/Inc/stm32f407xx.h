@@ -7,7 +7,15 @@
 
 #ifndef INC_STM32F407XX_H_
 #define INC_STM32F407XX_H_
+
+/*
+ * Type Macros
+ */
 #define __vo volatile
+#define __weak __attribute__((weak))
+
+
+
 #include <stddef.h>
 #include <stdint.h>
 /*

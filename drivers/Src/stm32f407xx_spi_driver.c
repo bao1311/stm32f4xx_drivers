@@ -415,4 +415,11 @@ void SPI_CloseReception(SPI_Handle_t* pHandle)
 
 }
 
+
+__weak void SPI_ApplicationEventCallback(SPI_Handle_t* pHandle, uint8_t AppEv)
+{
+
+}
+
+
 #endif /* SRC_STM32F407XX_SPI_DRIVER_C_ */

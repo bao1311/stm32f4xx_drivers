@@ -184,6 +184,9 @@ uint8_t SPI_GetFlagStatus(SPI_RegDef_t* pSPIx, uint8_t FlagName);
 void SPI_ClearOVRFlag(SPI_RegDef_t* pSPIx);
 void SPI_CloseTransmission(SPI_Handle_t* pHandle);
 void SPI_CloseReception(SPI_Handle_t* pHandle);
-void SPI_ApplicationEventCallbak(SPI_Handle_t* pHandle, uint8_t AppEv);
+/*
+ * Application callback
+ */
+void SPI_ApplicationEventCallback(SPI_Handle_t* pHandle, uint8_t AppEv);
 
 #endif /*  INC_STM32F407XX_SPI_DRIVER_H_ */
