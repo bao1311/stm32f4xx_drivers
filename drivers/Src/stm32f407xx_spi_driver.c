@@ -271,7 +271,7 @@ uint8_t SPI_ReceiveDataIT(SPI_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Le
 
 static void spi_txe_interrupt_handle(SPI_Handle_t* pHandle);
 static void spi_rxne_interrupt_handle(SPI_Handle_t* pHandle);
-static void spi_ovr_interrupt_handle(SPI_Handle_t* pHandle);
+static void spi_ovr_err_interrupt_handle(SPI_Handle_t* pHandle);
 
 /*
  * IRQ Configuration and ISR Handling
@@ -301,7 +301,7 @@ void SPI_IRQHandling(SPI_Handle_t* pHandle)
 	temp2 = pHandle->pSPIx->SR & (1 << SPI_SR_OVR);
 	if (temp1 && temp2)
 	{
-		spi_ovr_interrupt_handle(pHandle);
+		spi_ovr_err_interrupt_handle(pHandle);
 	}
 }
 
@@ -331,12 +331,10 @@ static void spi_txe_interrupt_handle(SPI_Handle_t* pHandle)
 			pHandle->pTxBuffer++;
 		}
 	}
+	// 2. Reset pHandle for TX and Application Event call back
 	if (pHandle->TxLen == 0)
 	{
-		pHandle->pSPIx->CR2 &= ~(1 << SPI_CR2_TXEIE);
-		pHandle->pTxBuffer = NULL;
-		pHandle->TxState = SPI_READY;
-		pHandle->TxLen = 0;
+		SPI_CloseTransmission(pHandle);
 		SPI_ApplicationEventCallback(pHandle,SPI_EVENT_TX_CMPLT);
 
 
@@ -358,7 +356,7 @@ static void spi_rxne_interrupt_handle(SPI_Handle_t* pHandle)
 		}
 		else
 		{
-			pHandle->pRxBuffer = pHandle->pSPIx->DR;
+			*(pHandle->pRxBuffer) = pHandle->pSPIx->DR;
 			pHandle->pRxBuffer++;
 			pHandle->RxLen -= 1;
 
@@ -367,18 +365,54 @@ static void spi_rxne_interrupt_handle(SPI_Handle_t* pHandle)
 	}
 	if (!pHandle->RxLen)
 	{
-		// 4. Reset pHandle and application event call back
-		pHandle->RxLen = 0;
-		pHandle->RxState = SPI_READY;
-		pHandle->pRxBuffer = NULL;
-		pHandle->pSPIx->CR2 &= ~(1 << SPI_CR2_RXNEIE);
+		// 4. Reset pHandle for RX and application event call back
+		SPI_CloseReception(pHandle);
 		SPI_ApplicationEventCallback(pHandle,SPI_EVENT_RX_CMPLT);
 
 	}
 
 }
 
-static void spi_ovr_interrupt_handle(SPI_Handle_t* pHandle);
+static void spi_ovr_err_interrupt_handle(SPI_Handle_t* pHandle)
+{
+	/*
+	 * Handle overrun by  clearing the OVR bit
+	 */
+	uint8_t temp;
+	// Only clear the OVR flag if the device is not busy transmitting
+	if (pHandle->TxState != SPI_BUSY_IN_TX)
+	{
+		temp = pHandle->pSPIx->DR;
+		temp = pHandle->pSPIx->SR;
+	}
+	(void)temp;
+	SPI_ApplicationEventCallback(pHandle,SPI_EVENT_OVR_ERR);
 
+}
+
+void SPI_ClearOVRFlag(SPI_RegDef_t* pSPIx)
+{
+	uint8_t temp;
+	temp = pSPIx->DR;
+	temp = pSPIx->SR;
+	(void)temp;
+
+}
+void SPI_CloseTransmission(SPI_Handle_t* pHandle)
+{
+	pHandle->pSPIx->CR2 &= ~(1 << SPI_CR2_TXEIE);
+	pHandle->pTxBuffer = NULL;
+	pHandle->TxState = SPI_READY;
+	pHandle->TxLen = 0;
+
+}
+void SPI_CloseReception(SPI_Handle_t* pHandle)
+{
+	pHandle->RxLen = 0;
+	pHandle->RxState = SPI_READY;
+	pHandle->pRxBuffer = NULL;
+	pHandle->pSPIx->CR2 &= ~(1 << SPI_CR2_RXNEIE);
+
+}
 
 #endif /* SRC_STM32F407XX_SPI_DRIVER_C_ */

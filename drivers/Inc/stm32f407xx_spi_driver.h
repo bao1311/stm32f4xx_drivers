@@ -177,5 +177,9 @@ void SPI_IRQHandling(SPI_Handle_t* pHandle);
 /*
  * Other Peripheral Control APIs
  */
+void SPI_ClearOVRFlag(SPI_RegDef_t* pSPIx);
+void SPI_CloseTransmission(SPI_Handle_t* pHandle);
+void SPI_CloseReception(SPI_Handle_t* pHandle);
+void SPI_ApplicationEventCallbak(SPI_Handle_t* pHandle, uint8_t AppEv);
 
 #endif /*  INC_STM32F407XX_SPI_DRIVER_H_ */
