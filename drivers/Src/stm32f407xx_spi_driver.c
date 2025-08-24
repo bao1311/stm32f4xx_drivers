@@ -352,14 +352,14 @@ static void spi_rxne_interrupt_handle(SPI_Handle_t* pHandle)
 		{
 			// 3. In case DFF is 1, data transfer will be 16 bits
 			*((uint16_t*)pHandle->pRxBuffer) = (uint16_t)pHandle->pSPIx->DR;
-			(uint16_t*)pHandle->pRxBuffer--;
+			(uint16_t*)pHandle->pRxBuffer++;
 			pHandle->RxLen -= 2;
 
 		}
 		else
 		{
 			pHandle->pRxBuffer = pHandle->pSPIx->DR;
-			pHandle->pRxBuffer--;
+			pHandle->pRxBuffer++;
 			pHandle->RxLen -= 1;
 
 		}
@@ -371,7 +371,7 @@ static void spi_rxne_interrupt_handle(SPI_Handle_t* pHandle)
 		pHandle->RxLen = 0;
 		pHandle->RxState = SPI_READY;
 		pHandle->pRxBuffer = NULL;
-		pHandle->pSPIx->CR2 &= (1 << SPI_CR2_RXNEIE);
+		pHandle->pSPIx->CR2 &= ~(1 << SPI_CR2_RXNEIE);
 		SPI_ApplicationEventCallback(pHandle,SPI_EVENT_RX_CMPLT);
 
 	}
