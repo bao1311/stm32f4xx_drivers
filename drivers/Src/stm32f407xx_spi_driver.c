@@ -276,7 +276,7 @@ static void spi_ovr_err_interrupt_handle(SPI_Handle_t* pHandle);
 /*
  * IRQ Configuration and ISR Handling
  */
-void SPI_IRQPriorityHandling(uint8_t IRQNumber, uint8_t IRQPriority);
+void SPI_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority);
 void SPI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi);
 void SPI_IRQHandling(SPI_Handle_t* pHandle)
 {
