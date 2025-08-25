@@ -415,6 +415,26 @@ void SPI_CloseReception(SPI_Handle_t* pHandle)
 
 }
 
+/*
+ * @fn 				- SPI_IRQPriorityConfig
+ * @brief			- This functions configure the NVIC priority register inside NVIC block of ARM-Cortex M4 based on the interrupt
+ *
+ * @param[in]		- IRQNumber
+ * @param[in]		- IRQPriority
+ *
+ * @return:
+ * @Note: ARM-Cortex M4 states that the priority value can range from 0 - 255. However, the number of priority bits is depended on
+ * the MCU
+ */
+void SPI_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
+{
+	uint8_t iprx, iprx_section;
+	iprx = IRQNumber / 4;
+	iprx_section = IRQNumber % 4;
+	uint8_t shiftAmt = 8 * iprx_section - (8 - NO_PR_BITS_IMPLEMENTED);
+	*(NVIC_PR_BASEADDR + iprx) |= (IRQPriority << shiftAmt);
+}
+
 
 __weak void SPI_ApplicationEventCallback(SPI_Handle_t* pHandle, uint8_t AppEv)
 {

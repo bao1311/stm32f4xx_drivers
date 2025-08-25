@@ -169,7 +169,7 @@ uint8_t SPI_ReceiveDataIT(SPI_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Le
 /*
  * IRQ Configuration and ISR Handling
  */
-void SPI_IRQPriorityHandling(uint8_t IRQNumber, uint8_t IRQPriority);
+void SPI_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority);
 void SPI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi);
 void SPI_IRQHandling(SPI_Handle_t* pHandle);
 
