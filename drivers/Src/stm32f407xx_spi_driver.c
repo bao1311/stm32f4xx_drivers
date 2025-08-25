@@ -453,15 +453,15 @@ void SPI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
 		// 2. Toggle the ENABLE bit of ISER based on the IRQ Number
 		if (IRQNumber < 32)
 		{
-			NVIC_ISER0 |= (1 << IRQNumber);
+			*NVIC_ISER0 |= (1 << IRQNumber);
 		}
 		else if (IRQNumber < 64)
 		{
-			NVIC_ISER1 |= (1 << (IRQNumber % 32));
+			*NVIC_ISER1 |= (1 << (IRQNumber % 32));
 		}
 		else
 		{
-			NVIC_ISER2 |= (1 << (IRQNumber % 32));
+			*NVIC_ISER2 |= (1 << (IRQNumber % 32));
 		}
 	}
 	else
@@ -469,15 +469,15 @@ void SPI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
 		// 2. Toggle the DISABLE bit of ICER based on the IRQ Number
 		if (IRQNumber < 32)
 		{
-			NVIC_ICER0 |= (1 << IRQNumber);
+			*NVIC_ICER0 |= (1 << IRQNumber);
 		}
 		else if (IRQNumber < 64)
 		{
-			NVIC_ICER1 |= (1 << (IRQNumber % 32));
+			*NVIC_ICER1 |= (1 << (IRQNumber % 32));
 		}
 		else
 		{
-			NVIC_ICER2 |= (1 << (IRQNumber % 32));
+			*NVIC_ICER2 |= (1 << (IRQNumber % 32));
 		}
 
 	}
