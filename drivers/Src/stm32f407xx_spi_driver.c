@@ -435,6 +435,53 @@ void SPI_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
 	*(NVIC_PR_BASEADDR + iprx) |= (IRQPriority << shiftAmt);
 }
 
+/*
+ * @fn			- SPI_IRQInterruptConfig
+ *
+ * @brief		- This function enable the interrupt based on the IRQ Number and EnorDi flag
+ * @param[in]	- IRQNumber
+ * @param[in]	- EnorDi
+ *
+ * @return:
+ * @Note:
+ */
+void SPI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
+{
+	// 1. Split the case between Enable and Disable interrupt
+	if (EnorDi == ENABLE)
+	{
+		// 2. Toggle the ENABLE bit of ISER based on the IRQ Number
+		if (IRQNumber < 32)
+		{
+			NVIC_ISER0 |= (1 << IRQNumber);
+		}
+		else if (IRQNumber < 64)
+		{
+			NVIC_ISER1 |= (1 << (IRQNumber % 32));
+		}
+		else
+		{
+			NVIC_ISER2 |= (1 << (IRQNumber % 32));
+		}
+	}
+	else
+	{
+		// 2. Toggle the DISABLE bit of ICER based on the IRQ Number
+		if (IRQNumber < 32)
+		{
+			NVIC_ICER0 |= (1 << IRQNumber);
+		}
+		else if (IRQNumber < 64)
+		{
+			NVIC_ICER1 |= (1 << (IRQNumber % 32));
+		}
+		else
+		{
+			NVIC_ICER2 |= (1 << (IRQNumber % 32));
+		}
+
+	}
+}
 
 __weak void SPI_ApplicationEventCallback(SPI_Handle_t* pHandle, uint8_t AppEv)
 {
