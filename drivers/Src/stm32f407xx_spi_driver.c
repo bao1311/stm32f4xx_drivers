@@ -482,6 +482,41 @@ void SPI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
 
 	}
 }
+/*
+ * @fn
+ * @brief
+ * @param[in]
+ * @paran[in]
+ * @return:
+ * @Note:
+ */
+void SPI_SSIConfig(SPI_RegDef_t* pSPIx, uint8_t EnorDi)
+{
+	if (EnorDi == ENABLE)
+	{
+		pSPIx->CR1 |= (1 << SPI_CR1_SSI);
+
+	}
+	else
+	{
+		pSPIx->CR1 &= ~(1 << SPI_CR1_SSI);
+
+	}
+}
+void SPI_SSOEConfig(SPI_RegDef_t* pSPIx, uint8_t EnorDi)
+{
+	if (EnorDi == ENABLE)
+	{
+		pSPIx->CR2 |= (1 << SPI_CR2_SSOE);
+
+	}
+	else
+	{
+		pSPIx->CR2 &= ~(1 << SPI_CR2_SSOE);
+
+	}
+}
+
 
 __weak void SPI_ApplicationEventCallback(SPI_Handle_t* pHandle, uint8_t AppEv)
 {
