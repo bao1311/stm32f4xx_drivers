@@ -419,6 +419,13 @@ typedef struct
 #define IRQ_NO_EXTI9_5			23
 #define IRQ_NO_EXTI15_10		40
 
+/*
+ * IRQ Number of STM32F407 MCU for SPI
+ */
+#define IRQ_NO_SPI1				35
+#define IRQ_NO_SPI2				36
+#define IRQ_NO_SPI3				51
+
 #include "stm32f407xx_gpio_driver.h"
 #include "stm32f407xx_spi_driver.h"
 
