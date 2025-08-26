@@ -9,6 +9,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <stm32f407xx.h>
+void delay()
+{
+	for (uint32_t i = 0; i < 100000; i += 1)
+	{
+
+	}
+}
+
 /*
  * Requirements: Print hello world string through SPI2 peripheral
  */
@@ -38,7 +46,7 @@ void SPI2_GPIOInits(void)
 
 	// SPI2_NSS
 	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_12;
-	GPIO_Init(SPIPins.pGPIOx);
+	GPIO_Init(&SPIPins);
 
 	// SPI2_SCK
 	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_13;
@@ -76,6 +84,20 @@ void SPI2_Inits(void)
 
 }
 
+void GPIOBtn_Init(void)
+{
+	// Configure the button
+	GPIO_Handle_t gpioButton;
+	gpioButton.pGPIOx = GPIOA;
+	gpioButton.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_0;
+	gpioButton.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
+	gpioButton.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_PP;
+	gpioButton.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_PIN_PD;
+	gpioButton.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_IN;
+//	GPIO_PeriClockControl(GPIOA, ENABLE);
+	GPIO_Init(&gpioButton);
+}
+
 int main(void)
 {
 	char user_data[] = "Hello, world";
@@ -88,10 +110,14 @@ int main(void)
 	SPI_SSOEConfig(SPI2, ENABLE);
 	// Send data
 	SPI_PeripheralControl(SPI2, ENABLE);
-	SPI_SendData(SPI2, (uint8_t*)user_data, strlen(user_data));
-	SPI_PeripheralControl(SPI2, DISABLE);
+	while (1)
+	{
+		while (!GPIO_ReadFromInputPin(GPIOA, GPIO_PIN_NO_0));
+		delay();
+		SPI_SendData(SPI2, (uint8_t*)user_data, strlen(user_data));
+		SPI_PeripheralControl(SPI2, DISABLE);
+	}
 
-	while(1);
 	return 0;
 }
 
