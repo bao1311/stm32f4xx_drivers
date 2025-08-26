@@ -115,6 +115,7 @@ int main(void)
 		while (!GPIO_ReadFromInputPin(GPIOA, GPIO_PIN_NO_0));
 		delay();
 		SPI_SendData(SPI2, (uint8_t*)user_data, strlen(user_data));
+		while (SPI_GetFlagStatus(SPI2, SPI_BUSY_FLAG));
 		SPI_PeripheralControl(SPI2, DISABLE);
 	}
 
