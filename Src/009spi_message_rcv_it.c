@@ -115,6 +115,7 @@ void Slave_GPIO_InterruptPinInit(void)
 int main(void)
 {
 
+	printf("Hello, world!\n");
 	uint8_t dummy = 0xff;
 
 	Slave_GPIO_InterruptPinInit();
@@ -151,7 +152,7 @@ int main(void)
 		{
 			/* fetch the data from the SPI peripheral byte by byte in interrupt mode */
 			while ( SPI_SendDataIT(&SPI2handle,&dummy,1) == SPI_BUSY_IN_TX);
-			while ( SPI_ReceiveDataIT(&SPI2handle,&ReadByte,1) == SPI_BUSY_IN_RX );
+			while ( SPI_ReceiveDataIT(&SPI2handle,(uint8_t*)&ReadByte,1) == SPI_BUSY_IN_RX );
 		}
 
 

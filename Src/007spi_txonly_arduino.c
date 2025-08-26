@@ -1,9 +1,11 @@
 /*
- * 006spi_tx_testing.c
+ * 007spi_txonly_arduino.c
  *
- *  Created on: Aug 17, 2025
+ *  Created on: Aug 26, 2025
  *      Author: gphi1
  */
+
+
 #include <stdio.h>
 #include <string.h>
 #include <stm32f407xx.h>
@@ -35,8 +37,8 @@ void SPI2_GPIOInits(void)
 
 
 	// SPI2_NSS
-//	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_12;
-//	GPIO_Init(SPIPins.pGPIOx);
+	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_12;
+	GPIO_Init(SPIPins.pGPIOx);
 
 	// SPI2_SCK
 	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_13;
@@ -64,10 +66,10 @@ void SPI2_Inits(void)
 	SPI2Handle.SPIConfig.SPI_CPHA = SPI_CPHA_LOW;
 	SPI2Handle.SPIConfig.SPI_CPOL = SPI_CPOL_LOW;
 	SPI2Handle.SPIConfig.SPI_DFF  = SPI_DFF_8BITS;
-	// Generate clock speed of 8 MHz
-	SPI2Handle.SPIConfig.SPI_SclkSpeed = SPI_SCLK_SPEED_DIV2;
-	// Software slave management enable for NSS pin
-	SPI2Handle.SPIConfig.SPI_SSM = SPI_SSM_EN;
+	// Generate clock speed of 2 MHz
+	SPI2Handle.SPIConfig.SPI_SclkSpeed = SPI_SCLK_SPEED_DIV8;
+	// Hardware slave management enable for NSS pin
+	SPI2Handle.SPIConfig.SPI_SSM = SPI_SSM_DI;
 
 	// 3. Call SPI Init
 	SPI_Init(&SPI2Handle);
@@ -81,11 +83,12 @@ int main(void)
 
 	SPI2_Inits();
 	// Avoid MODF error by toggling SSI bit
-	SPI_SSIConfig(SPI2, ENABLE);
+//	SPI_SSIConfig(SPI2, ENABLE);
+	// Configure SSOE bit for NSS configuration (NSS output enable (SSM=0,SSOE=1))
+	SPI_SSOEConfig(SPI2, ENABLE);
 	// Send data
 	SPI_PeripheralControl(SPI2, ENABLE);
 	SPI_SendData(SPI2, (uint8_t*)user_data, strlen(user_data));
-	printf("Hello world");
 	SPI_PeripheralControl(SPI2, DISABLE);
 
 	while(1);

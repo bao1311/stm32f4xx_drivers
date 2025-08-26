@@ -43,6 +43,8 @@ void SPI_Init(SPI_Handle_t* pSPIHandle)
 	tempreg |= pSPIHandle->SPIConfig.SPI_CPOL << SPI_CR1_CPOL;
 	// 6. Configure the clock phase
 	tempreg |= pSPIHandle->SPIConfig.SPI_CPHA << SPI_CR1_CPHA;
+
+	tempreg |= pSPIHandle->SPIConfig.SPI_SSM << SPI_CR1_SSM;
 	pSPIHandle->pSPIx->CR1 = tempreg;
 }
 void SPI_DeInit(SPI_RegDef_t* pSPIx)
