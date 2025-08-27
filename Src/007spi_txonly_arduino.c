@@ -110,6 +110,7 @@ int main(void)
 	SPI_SSOEConfig(SPI2, ENABLE);
 	// Send data
 	SPI_PeripheralControl(SPI2, ENABLE);
+	GPIOBtn_Init();
 	while (1)
 	{
 		while (!GPIO_ReadFromInputPin(GPIOA, GPIO_PIN_NO_0));
