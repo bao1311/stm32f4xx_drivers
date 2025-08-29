@@ -109,7 +109,53 @@ void I2C_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
 	uint8_t shiftAmt = irpx_section * 8 + (8 - NO_PR_BITS_IMPLEMENTED);
 	*(NVIC_PR_BASEADDR + irpx) |= (IRQPriority << shiftAmt);
 }
-void I2C_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi); //Cando
+/*
+ * @fn 			- I2C_IRQInterruptConfig
+ *
+ * @brief		- This function enable the interrupt based on the IRQ number
+ * @param[in]	- IRQNumber
+ * @param[in]	- EnorDi
+ *
+ * @return
+ * @Note: Use ISER (Set-enable register). STM32F407 only has 82 maskable
+ * interrupt channels
+ */
+void I2C_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
+{
+	if (EnorDi == ENABLE)
+	{
+		if (IRQNumber < 32)
+		{
+			*NVIC_ISER0 |= (1 << IRQNumber);
+		}
+		else if (IRQNumber < 64)
+		{
+			*NVIC_ISER1 |= (1 << (IRQNumber%32));
+		}
+		else
+		{
+			*NVIC_ISER2 |= (1 << (IRQNumber%64));
+		}
+
+	}
+	else
+	{
+
+		if (IRQNumber < 32)
+		{
+			*NVIC_ISER0 &= ~(1 << IRQNumber);
+		}
+		else if (IRQNumber < 64)
+		{
+			*NVIC_ISER1 &= ~(1 << (IRQNumber%32));
+		}
+		else
+		{
+			*NVIC_ISER2 &= ~(1 << (IRQNumber%64));
+		}
+	}
+
+}
 
 
 /*
