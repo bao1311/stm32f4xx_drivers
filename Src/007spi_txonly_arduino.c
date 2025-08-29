@@ -45,7 +45,7 @@ void SPI2_GPIOInits(void)
 
 
 	// SPI2_NSS
-//	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_12;
+	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_12;
 	GPIO_Init(&SPIPins);
 
 	SPIPins.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_NO_PUPD;
@@ -116,10 +116,11 @@ int main(void)
 	{
 		while (!GPIO_ReadFromInputPin(GPIOA, GPIO_PIN_NO_0));
 		delay();
+		SPI_PeripheralControl(SPI2, ENABLE);
 		uint8_t dataLen = strlen(user_data);
 		SPI_SendData(SPI2, &dataLen, 1);
 		SPI_SendData(SPI2, (uint8_t*)user_data, strlen(user_data));
-		while (SPI_GetFlagStatus(SPI2, SPI_BUSY_FLAG));
+//		while (SPI_GetFlagStatus(SPI2, SPI_BUSY_FLAG));
 		SPI_PeripheralControl(SPI2, DISABLE);
 	}
 
