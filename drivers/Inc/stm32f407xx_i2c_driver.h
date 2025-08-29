@@ -8,6 +8,12 @@
 #ifndef INC_STM32F407XX_I2C_DRIVER_H_
 #define INC_STM32F407XX_I2C_DRIVER_H_
 
+/*
+ * Configuration structure for I2Cx peripheral
+ */
+typedef struct {
+	uint8_t I2C_
+};
 
 
 #endif /* INC_STM32F407XX_I2C_DRIVER_H_ */

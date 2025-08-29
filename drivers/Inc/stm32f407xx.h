@@ -198,6 +198,25 @@ typedef struct
 #define EXTI ((EXTI_RegDef_t*) EXTI_BASEADDR)
 
 /*
+ * I2C register mappings
+ */
+typedef struct
+{
+	__vo uint32_t CR1;			// I2C Control register 1
+	__vo uint32_t CR2;			// I2C Control register 2
+	__vo uint32_t OAR1;			// I2C Own address register 1
+	__vo uint32_t OAR2;			// I2C Own address register 2
+	__vo uint32_t DR;			// I2C Data register
+	__vo uint32_t SR1;			// I2C Status register 1
+	__vo uint32_t SR2;			// I2C Status register 2
+	__vo uint32_t CCR;			// I2C Clock control register
+	__vo uint32_t TRISE;		// I2C TRISE register
+	__vo uint32_t FLTR;			// I2C FLTR register
+}I2C_RegDef_t;
+#define I2C1 ((I2C_RegDef_t*) I2C1_BASEADDR)
+#define I2C2 ((I2C_RegDef_t*) I2C2_BASEADDR)
+#define I2C3 ((I2C_RegDef_t*) I2C3_BASEADDR)
+/*
  * SPI register mappings
  */
 typedef struct
