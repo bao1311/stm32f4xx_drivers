@@ -100,7 +100,15 @@ uint8_t I2C_ReceiveDataIT(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Le
 /*
  * IRQ Configuration and ISR Handling
  */
-void I2C_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority); // Cando
+void I2C_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
+{
+	uint8_t irpx, irpx_section;
+	irpx = IRQNumber / 4;
+	irpx_section = IRQNumber % 4;
+	// STM32F407 only have 16 priority level
+	uint8_t shiftAmt = irpx_section * 8 + (8 - NO_PR_BITS_IMPLEMENTED);
+	*(NVIC_PR_BASEADDR + irpx) |= (IRQPriority << shiftAmt);
+}
 void I2C_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi); //Cando
 
 
