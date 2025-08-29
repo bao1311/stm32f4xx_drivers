@@ -105,6 +105,16 @@
 #define I2C_CR1_PEC				12
 #define I2C_CR1_ALERT			13
 #define I2C_CR1_SWRST			15
+
+/*
+ * I2C_CR2 register
+ */
+#define I2C_CR2_FREQ			0
+#define I2C_CR2_ITERREN			8
+#define I2C_CR2_ITEVTEN			9
+#define I2C_CR2_ITBUFEN			10
+#define I2C_CR2_DMAEN			11
+#define I2C_CR2_LAST			12
 /*
  *********************************************************
  *Bit position definitions of SPI peripheral
