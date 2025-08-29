@@ -83,7 +83,28 @@
 #define FLAG_RESET		RESET
 #define FLAG_SET		SET
 
-
+/*
+ * *******************************************************
+ * Bit position definitions of I2C peripheral
+ * *******************************************************
+ */
+/*
+ * I2C_CR1 register
+ */
+#define I2C_CR1_PE				0
+#define I2C_CR1_SMBUS			1
+#define I2C_CR1_SMBTYPE			3
+#define I2C_CR1_ENARP			4
+#define I2C_CR1_ENPEC			5
+#define I2C_CR1_ENGC			6
+#define I2C_CR1_NOSTRETCH		7
+#define I2C_CR1_START			8
+#define I2C_CR1_STOP			9
+#define I2C_CR1_ACK				10
+#define I2C_CR1_POS				11
+#define I2C_CR1_PEC				12
+#define I2C_CR1_ALERT			13
+#define I2C_CR1_SWRST			15
 /*
  *********************************************************
  *Bit position definitions of SPI peripheral

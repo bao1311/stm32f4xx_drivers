@@ -12,8 +12,10 @@
  * Configuration structure for I2Cx peripheral
  */
 typedef struct {
-	uint8_t I2C_
-};
+} I2C_Handle_t;
+
+typedef struct {
+} I2C_Config_t;
 
 
 #endif /* INC_STM32F407XX_I2C_DRIVER_H_ */

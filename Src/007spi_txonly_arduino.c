@@ -119,8 +119,9 @@ int main(void)
 		SPI_PeripheralControl(SPI2, ENABLE);
 		uint8_t dataLen = strlen(user_data);
 		SPI_SendData(SPI2, &dataLen, 1);
+		while (SPI_GetFlagStatus(SPI2, SPI_BUSY_FLAG));
 		SPI_SendData(SPI2, (uint8_t*)user_data, strlen(user_data));
-//		while (SPI_GetFlagStatus(SPI2, SPI_BUSY_FLAG));
+		while (SPI_GetFlagStatus(SPI2, SPI_BUSY_FLAG));
 		SPI_PeripheralControl(SPI2, DISABLE);
 	}
 
