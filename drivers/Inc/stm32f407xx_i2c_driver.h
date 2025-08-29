@@ -27,4 +27,27 @@ typedef struct {
 } I2C_Config_t;
 
 
+/*
+ * @I2C_SCLSpeed
+ */
+#define I2C_SCL_SPEED_SM				100000
+#define I2C_SCL_SPEED_FM_2k				200000
+#define I2C_SCL_SPEED_FM				400000
+
+/*
+ * @I2C_ACK
+ */
+#define I2C_ACK_DISABLE					0
+#define I2C_ACK_ENABLE					1
+
+/*
+ * @I2C_FMDutyCycle
+ */
+#define I2C_FM_DUTY_2					0
+#define I2C_FM_DUTY_16_9				1
+
+
+
+
+
 #endif /* INC_STM32F407XX_I2C_DRIVER_H_ */
