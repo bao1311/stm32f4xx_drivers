@@ -135,6 +135,17 @@
 #define	I2C_SR1_TIMEOUT					14
 #define	I2C_SR1_SMBALERT				15
 
+/*
+ * I2C_SR2
+ */
+#define I2C_SR2_MSL				0
+#define I2C_SR2_BUSY			1
+#define I2C_SR2_TRA				2
+#define I2C_SR2_GENCALL			4
+#define I2C_SR2_SMBDEFAULT		5
+#define I2C_SR2_SMBHOST			6
+#define I2C_SR2_DUALF			7
+#define I2C_SR2_PEC				8
 
 /*
  *
