@@ -115,7 +115,29 @@
 #define I2C_CR2_ITBUFEN			10
 #define I2C_CR2_DMAEN			11
 #define I2C_CR2_LAST			12
+
+
 /*
+ * I2C_SR1 register
+ */
+#define I2C_SR1_SB						0
+#define I2C_SR1_ADDR					1
+#define I2C_SR1_BTF						2
+#define I2C_SR1_ADD10					3
+#define I2C_SR1_STOPF					4
+#define	I2C_SR1_RxNE					6
+#define	I2C_SR1_TxE						7
+#define	I2C_SR1_BERR					8
+#define	I2C_SR1_ARLO					9
+#define	I2C_SR1_AF						10
+#define	I2C_SR1_OVR						11
+#define	I2C_SR1_PECERR					12
+#define	I2C_SR1_TIMEOUT					14
+#define	I2C_SR1_SMBALERT				15
+
+
+/*
+ *
  *********************************************************
  *Bit position definitions of SPI peripheral
  *********************************************************
