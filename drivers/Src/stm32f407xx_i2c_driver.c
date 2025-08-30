@@ -81,12 +81,53 @@ void I2C_Init(I2C_Handle_t* pI2CHandle)
 {
 	uint32_t tempreg = 0;
 	// Configure CR1 register of I2C
+	// ack control bit
 	tempreg |= (pI2CHandle->I2C_Config.I2C_ACK << I2C_CR1_ACK);
-	pI2CHandle->pI2Cx->CR1 |= tempreg;
+	pI2CHandle->pI2Cx->CR1 = tempreg;
 	// Configure CR2 register of I2C
-	tempreg |= RCC_GetPCLK1Value();
+	// configurethe freq field of CR2
+	tempreg = 0;
+	tempreg |= ((RCC_GetPCLK1Value()/1000000U) << I2C_CR2_FREQ);
+	pI2CHandle->pI2Cx->CR2 = (tempreg & 0x3F);
+	// Configure OAR1 (Own address register 1) of I2C
+	tempreg = 0;
+	tempreg |= (1 << 14);
+	tempreg |= (pI2CHandle->I2C_Config.I2C_DeviceAddress << 1);
+	pI2CHandle->pI2Cx->OAR1 = tempreg;
+	// Configure the CCR register of I2C
+	tempreg = 0;
+	uint16_t ccr = 0;
+	// CCR calculation
+	if (pI2CHandle->I2C_Config.I2C_SCLSpeed <= I2C_SCL_SPEED_SM)
+	{
+		// I2C SCL standard mode
+		// Note: In standard mode, Thigh = Tlow
+		ccr = RCC_GetPCLK1Value() / (2 * pI2CHandle->I2C_Config.I2C_SCLSpeed);
+		tempreg |= (ccr & 0xFFF);
+	}
+	else
+	{
+		// I2C SCL fast mode
+		tempreg |= (1 << I2C_CCR_FS);
+		tempreg |= (pI2CHandle->I2C_Config.I2C_FMDutyCycle << I2C_CCR_DUTY);
+		if (pI2CHandle->I2C_Config.I2C_FMDutyCycle == I2C_FM_DUTY_2)
+		{
+			// DUTY_2 mode
+			// Note: In this mode, Tlow = 2 * Thigh
+			ccr =  (RCC_GetPCLK1Value())/(3 * pI2CHandle->I2C_Config.I2C_SCLSpeed);
+		}
+		else
+		{
+			// DUTY_16_9 mode
+			ccr =  (RCC_GetPCLK1Value())/(25 * pI2CHandle->I2C_Config.I2C_SCLSpeed);
+		}
 
+		tempreg |= (ccr & 0xFFF);
+	}
+
+	pI2CHandle->pI2Cx->CCR = tempreg;
 }
+
 /*
  * API for I2C Peripheral Clock Setup
  */
