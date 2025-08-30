@@ -196,17 +196,23 @@ void I2C_SendAddress(I2C_Handle_t* pHandle)
 {
 	pHandle->pI2Cx->OAR1 |= (pHandle->I2C_Config.I2C_DeviceAddress << 1);
 }
+void I2C_Ack(I2C_Handle_t* pHandle)
+{
+	pHandle->pI2Cx->
+}
+
 void I2C_MasterSendData(I2C_Handle_t* pHandle)
 {
 	// 1. Generate start signal
 	I2C_GenerateStartSignal(pHandle->pI2Cx);
 	// 2. Ensure that SB FLAG is set
-	while (I2C_GetFlagStatus(pHandle->pI2Cx, I2C_SB_FLAG));
+	while (! I2C_GetFlagStatus(pHandle->pI2Cx, I2C_SB_FLAG));
 	// 2. EV5: SB = 1. We will clear it by reading SR1 register
 	// followed by reading SR2 register
 	I2C_ClearSB(pHandle->pI2Cx);
 	// 3. Send Address
 	I2C_SendAddress(pHandle);
+	// 4. Acknowledge
 }
 
 /*
@@ -299,6 +305,9 @@ void I2C_PeripheralControl(I2C_RegDef_t* pI2Cx, uint8_t EnorDi)
 }
 uint8_t I2C_GetFlagStatus(I2C_RegDef_t* pI2Cx, uint8_t FlagName)
 {
+	if (pI2Cx->SR1 & FlagName)
+		return FLAG_SET;
+	return FLAG_RESET;
 
 }
 /*
