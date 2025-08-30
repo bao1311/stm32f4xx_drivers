@@ -178,12 +178,36 @@ void I2C_PeriClockControl(I2C_RegDef_t* pI2Cx, uint8_t EnorDi)
 }
 
 
-/*
- * Data send and receive (Blocking version)
- */
-void I2C_SendData(I2C_RegDef_t* pI2Cx, uint8_t* pTxBuffer, uint32_t Len);
-void I2C_ReceiveData(I2C_RegDef_t* pI2Cx, uint8_t* pRxBuffer, uint32_t Len);
+void I2C_GenerateStartSignal(I2C_RegDef_t* pI2Cx)
+{
+	pI2Cx->CR1 |= (1 << I2C_CR1_START);
+}
 
+void I2C_ClearSB(I2C_RegDef_t* pI2Cx)
+{
+	uint32_t temp;
+	temp = pI2Cx->SR1;
+	temp = pI2Cx->DR;
+	(void)temp;
+
+}
+
+void I2C_SendAddress(I2C_Handle_t* pHandle)
+{
+	pHandle->pI2Cx->OAR1 |= (pHandle->I2C_Config.I2C_DeviceAddress << 1);
+}
+void I2C_MasterSendData(I2C_Handle_t* pHandle)
+{
+	// 1. Generate start signal
+	I2C_GenerateStartSignal(pHandle->pI2Cx);
+	// 2. Ensure that SB FLAG is set
+	while (I2C_GetFlagStatus(pHandle->pI2Cx, I2C_SB_FLAG));
+	// 2. EV5: SB = 1. We will clear it by reading SR1 register
+	// followed by reading SR2 register
+	I2C_ClearSB(pHandle->pI2Cx);
+	// 3. Send Address
+	I2C_SendAddress(pHandle);
+}
 
 /*
  * Data send and receive (Interrupt version)

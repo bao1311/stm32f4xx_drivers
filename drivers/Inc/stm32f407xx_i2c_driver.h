@@ -41,6 +41,23 @@ typedef struct {
 #define I2C_ACK_ENABLE					1
 
 /*
+ * @I2C_FLAG
+ */
+#define I2C_SB_FLAG						(1 << 0)
+#define I2C_ADDR_FLAG					(1 << 1)
+#define I2C_BTF_FLAG					(1 << 2)
+#define I2C_ADD10_FLAG					(1 << 3)
+#define I2C_STOPF_FLAG					(1 << 4)
+#define I2C_RXNE_FLAG					(1 << 6)
+#define I2C_TXE_FLAG					(1 << 7)
+#define I2C_BERR_FLAG					(1 << 8)
+#define I2C_ARLO_FLAG					(1 << 9)
+#define I2C_AF_FLAG						(1 << 10)
+#define I2C_OVR_FLAG					(1 << 11)
+#define I2C_PECERR_FLAG					(1 << 12)
+#define I2C_TIMEOUT_FLAG				(1 << 14)
+#define I2C_SMBALERT_FLAG				(1 << 15)
+/*
  * @I2C_FMDutyCycle
  */
 #define I2C_FM_DUTY_2					0
