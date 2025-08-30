@@ -26,7 +26,14 @@ void I2C_DeInit(I2C_RegDef_t* pI2Cx)
 }
 
 
-void I2C_Init(I2C_Handle_t* pI2CHandle);
+void I2C_Init(I2C_Handle_t* pI2CHandle)
+{
+	uint32_t tempreg = 0;
+	// Configure CR1 register of I2C
+	tempreg |= (pI2CHandle->I2C_ACK << I2C_CR1_ACK);
+	p
+
+}
 /*
  * API for I2C Peripheral Clock Setup
  */
@@ -172,7 +179,10 @@ void I2C_PeripheralControl(I2C_RegDef_t* pI2Cx, uint8_t EnorDi)
 		pI2Cx->CR1 &= ~(1 << I2C_CR1_PE);
 	}
 }
-uint8_t I2C_GetFlagStatus(I2C_RegDef_t* pI2Cx, uint8_t FlagName);
+uint8_t I2C_GetFlagStatus(I2C_RegDef_t* pI2Cx, uint8_t FlagName)
+{
+
+}
 /*
  * Application callback
  */
