@@ -192,16 +192,27 @@ void I2C_ClearSB(I2C_RegDef_t* pI2Cx)
 
 }
 
-void I2C_SendAddress(I2C_Handle_t* pHandle)
+void I2C_ExecuteAddressPhase(I2C_RegDef_t* pI2Cx, uint8_t slaveAddress)
 {
-	pHandle->pI2Cx->OAR1 |= (pHandle->I2C_Config.I2C_DeviceAddress << 1);
+	uint8_t address = 0;
+	address |= (slaveAddress << 1);
+	address &= ~(1);
+	pI2Cx->DR |= (address << 1);
 }
-void I2C_Ack(I2C_Handle_t* pHandle)
+//void I2C_Ack(I2C_Handle_t* pHandle)
+//{
+////	pHandle->pI2Cx->
+//}
+
+void I2C_ClearADDR(I2C_RegDef_t* pI2Cx)
 {
-	pHandle->pI2Cx->
+	uint32_t temp;
+	temp = pI2Cx->SR1;
+	temp = pI2Cx->SR2;
+	(void)temp;
 }
 
-void I2C_MasterSendData(I2C_Handle_t* pHandle)
+void I2C_MasterSendData(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len, uint8_t SlaveAddr)
 {
 	// 1. Generate start signal
 	I2C_GenerateStartSignal(pHandle->pI2Cx);
@@ -211,8 +222,15 @@ void I2C_MasterSendData(I2C_Handle_t* pHandle)
 	// followed by reading SR2 register
 	I2C_ClearSB(pHandle->pI2Cx);
 	// 3. Send Address
-	I2C_SendAddress(pHandle);
-	// 4. Acknowledge
+	I2C_ExecuteAddressPhase(pHandle->pI2Cx, pHandle->I2C_Config.I2C_DeviceAddress);
+	// 4. Clear SR1 ADDR bit
+	I2C_ClearADDR(pHandle->pI2Cx);
+	// 4. Acknowledge will be done by the receiver (ACK/NACK)
+	// 5. Send data while Len > 0
+	while (Len > 0)
+	{
+
+	}
 }
 
 /*
