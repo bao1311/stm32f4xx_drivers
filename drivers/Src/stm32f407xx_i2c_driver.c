@@ -8,6 +8,7 @@
 #include "stm32f407xx_i2c_driver.h"
 
 
+static void I2C_GenerateStopSignal(I2C_RegDef_t* pI2Cx);
 
 void I2C_DeInit(I2C_RegDef_t* pI2Cx)
 {
@@ -178,12 +179,12 @@ void I2C_PeriClockControl(I2C_RegDef_t* pI2Cx, uint8_t EnorDi)
 }
 
 
-void I2C_GenerateStartSignal(I2C_RegDef_t* pI2Cx)
+static void I2C_GenerateStartSignal(I2C_RegDef_t* pI2Cx)
 {
 	pI2Cx->CR1 |= (1 << I2C_CR1_START);
 }
 
-void I2C_ClearSB(I2C_RegDef_t* pI2Cx)
+static void I2C_ClearSB(I2C_RegDef_t* pI2Cx)
 {
 	uint32_t temp;
 	temp = pI2Cx->SR1;
@@ -192,7 +193,7 @@ void I2C_ClearSB(I2C_RegDef_t* pI2Cx)
 
 }
 
-void I2C_ExecuteAddressPhase(I2C_RegDef_t* pI2Cx, uint8_t slaveAddress)
+static void I2C_ExecuteAddressPhase(I2C_RegDef_t* pI2Cx, uint8_t slaveAddress)
 {
 	uint8_t address = 0;
 	address |= (slaveAddress << 1);
@@ -204,7 +205,7 @@ void I2C_ExecuteAddressPhase(I2C_RegDef_t* pI2Cx, uint8_t slaveAddress)
 ////	pHandle->pI2Cx->
 //}
 
-void I2C_ClearADDR(I2C_RegDef_t* pI2Cx)
+static void I2C_ClearADDRFlag(I2C_RegDef_t* pI2Cx)
 {
 	uint32_t temp;
 	temp = pI2Cx->SR1;
@@ -224,13 +225,25 @@ void I2C_MasterSendData(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len,
 	// 3. Send Address
 	I2C_ExecuteAddressPhase(pHandle->pI2Cx, pHandle->I2C_Config.I2C_DeviceAddress);
 	// 4. Clear SR1 ADDR bit
-	I2C_ClearADDR(pHandle->pI2Cx);
+	I2C_ClearADDRFlag(pHandle->pI2Cx);
 	// 4. Acknowledge will be done by the receiver (ACK/NACK)
 	// 5. Send data while Len > 0
 	while (Len > 0)
 	{
+		while (! I2C_GetFlagStatus(pHandle->pI2Cx, I2C_TXE_FLAG));
 
+		pHandle->pI2Cx->DR = *pTxBuffer;
+		pTxBuffer++;
+		Len--;
 	}
+	// 6. Wait until TXE (DR empty for transmitters) and BTF (Byte transfer finished) flag is set to 1 (Hardware will set that)
+	while (! I2C_GetFlagStatus(pHandle->pI2Cx, I2C_TXE_FLAG));
+	while (! I2C_GetFlagStatus(pHandle->pI2Cx, I2C_BTF_FLAG));
+	I2C_GenerateStopSignal(pHandle->pI2Cx);
+}
+static void I2C_GenerateStopSignal(I2C_RegDef_t* pI2Cx)
+{
+	pI2Cx->CR1 |= (1 << I2C_CR1_STOP);
 }
 
 /*
