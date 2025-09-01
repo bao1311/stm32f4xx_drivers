@@ -212,10 +212,10 @@ static void I2C_ClearSB(I2C_RegDef_t* pI2Cx)
 
 }
 
-static void I2C_ExecuteAddressPhase(I2C_RegDef_t* pI2Cx, uint8_t slaveAddress)
+static void I2C_ExecuteAddressPhase(I2C_RegDef_t* pI2Cx, uint8_t SlaveAddress)
 {
 	uint8_t address = 0;
-	address |= (slaveAddress << 1);
+	address |= (SlaveAddress << 1);
 	address &= ~(1);
 	pI2Cx->DR |= (address << 1);
 }

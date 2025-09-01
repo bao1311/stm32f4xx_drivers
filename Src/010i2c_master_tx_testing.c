@@ -8,7 +8,10 @@
 // PB6 -> SCL
 // PB9 -> SDA
 #include "stm32f407xx_i2c_driver.h"
+#include "string.h"
 #define MY_ADDRESS 0x61
+#define SLAVE_ADDRESS 0x68
+I2C_Handle_t I2C1Handle;
 void I2C1_GPIOInits(void)
 {
 	GPIO_Handle_t I2C1Pins;
@@ -44,7 +47,6 @@ void GPIOBtn_Init(void)
 
 void I2C1_Inits(void)
 {
-	I2C_Handle_t I2C1Handle;
 	I2C1Handle.pI2Cx = I2C1;
 	I2C1Handle.I2C_Config.I2C_ACK = I2C_ACK_ENABLE;
 	I2C1Handle.I2C_Config.I2C_SCLSpeed = I2C_SCL_SPEED_SM;
@@ -74,8 +76,9 @@ int main(void)
 
 	while (1)
 	{
-		while (!I2C_GetFlagStatus(I2C1, I2C_TXE_FLAG));
-		I2C1->DR =
+		while (!GPIO_ReadFromInputPin(GPIOA, 0));
+		delay();
+		I2C_MasterSendData(&I2C1Handle, data, strlen((char*)data), SLAVE_ADDRESS);
 	}
 
 }
