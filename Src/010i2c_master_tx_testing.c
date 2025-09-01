@@ -54,6 +54,14 @@ void I2C1_Inits(void)
 
 }
 
+void delay()
+{
+	for (uint32_t i = 0; i < 100000; i += 1)
+	{
+
+	}
+}
+
 int main(void)
 {
 	uint8_t data[] = "Hello, world!\n";
@@ -67,6 +75,7 @@ int main(void)
 	while (1)
 	{
 		while (!I2C_GetFlagStatus(I2C1, I2C_TXE_FLAG));
+		I2C1->DR =
 	}
 
 }
