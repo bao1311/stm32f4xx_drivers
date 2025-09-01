@@ -64,5 +64,10 @@ int main(void)
 
 	I2C_PeripheralControl(I2C1, ENABLE);
 
+	while (1)
+	{
+		while (!I2C_GetFlagStatus(I2C1, I2C_TXE_FLAG));
+	}
+
 }
 
