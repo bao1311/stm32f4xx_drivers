@@ -223,12 +223,42 @@ static void I2C_ClearSB(I2C_RegDef_t* pI2Cx)
 
 }
 
-static void I2C_ExecuteAddressPhase(I2C_RegDef_t* pI2Cx, uint8_t SlaveAddress)
+/*
+ * *************************************
+ * @fn						- I2C_ExecuteAddressPhaseWrite
+ * @brief					- This function send the address of slave
+ *							and the read/write bit to the DR register
+ * @param[in]				- I2C_RegDef_t*
+ * @param[in]				- SlaveAddress
+ * @return: void
+ * @note:
+ */
+static void I2C_ExecuteAddressPhaseWrite(I2C_RegDef_t* pI2Cx, uint8_t SlaveAddress)
 {
 	uint8_t address = 0;
 	address |= (SlaveAddress << 1);
+	// read/write bit == 0 => Transmitter
 	address &= ~(1);
-	pI2Cx->DR |= (address << 1);
+	pI2Cx->DR |= address;
+}
+
+/*
+ * *************************************
+ * @fn						- I2C_ExecuteAddressPhaseRead
+ * @brief					- This function send the address of slave
+ *							and the read/write bit to the DR register
+ * @param[in]				- I2C_RegDef_t*
+ * @param[in]				- SlaveAddress
+ * @return: void
+ * @note:
+ */
+static void I2C_ExecuteAddressPhaseRead(I2C_RegDef_t* pI2Cx, uint8_t SlaveAddress)
+{
+	uint8_t address = 0;
+	address |= (SlaveAddress << 1);
+	// read/write bit == 1 => Receiver
+	address |= 1;
+	pI2Cx->DR |= address;
 }
 //void I2C_Ack(I2C_Handle_t* pHandle)
 //{
@@ -249,12 +279,13 @@ void I2C_MasterReceiveData(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t L
 	I2C_GenerateStartSignal(pHandle->pI2Cx);
 	// 2. Ensure the SB Flag is set
 	while (!I2C_GetFlagStatus(pHandle->pI2Cx, I2C_SB_FLAG));
+	// 3. Execute Address Phase for Receiver
+	I2C_ExecuteAddressPhaseRead(pHandle->pI2Cx, SlaveAddr);
+
 	if (Len == 1)
 	{
 
 	}
-	// 3. Send Address
-	I2C_ExecuteAddressPhase(pHandle->pI2Cx, SlaveAddr);
 	// 4. Clear Address bit
 	I2C_ClearADDRFlag(pHandle->pI2Cx);
 	// 5. Receive data
@@ -284,7 +315,7 @@ void I2C_MasterSendData(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len,
 	// followed by reading SR2 register
 //	I2C_ClearSB(pHandle->pI2Cx);
 	// 3. Send Address
-	I2C_ExecuteAddressPhase(pHandle->pI2Cx, pHandle->I2C_Config.I2C_DeviceAddress);
+	I2C_ExecuteAddressPhaseWrite(pHandle->pI2Cx, pHandle->I2C_Config.I2C_DeviceAddress);
 	// 4. Clear SR1 ADDR bit
 	I2C_ClearADDRFlag(pHandle->pI2Cx);
 	// 4. Acknowledge will be done by the receiver (ACK/NACK)
