@@ -8,7 +8,7 @@
 // PB6 -> SCL
 // PB9 -> SDA
 #include "stm32f407xx_i2c_driver.h"
-void I2C1_GPIOInits()
+void I2C1_GPIOInits(void)
 {
 	GPIO_Handle_t I2C1Pins;
 	// 1. Enable GPIO peripheral clock
@@ -27,13 +27,27 @@ void I2C1_GPIOInits()
 
 }
 
-void I2C1_Inits()
+void GPIOBtn_Init(void)
+{
+	GPIO_Handle_t gpioBtn;
+	gpioBtn.pGPIOx = GPIOA;
+	gpioBtn.GPIO_PinConfig.GPIO_PinAltFunMode = 0;
+	gpioBtn.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_IN;
+	gpioBtn.GPIO_PinConfig.GPIO_PinNumber = 0;
+	gpioBtn.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_OD;
+	gpioBtn.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_NO_PUPD;
+	gpioBtn.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
+	GPIO_Init(&gpioBtn);
+
+}
+
+void I2C1_Inits(void)
 {
 	I2C_Handle_t I2C1Handle;
 	I2C1Handle.pI2Cx = I2C1;
 	I2C1Handle.I2C_Config.I2C_ACK = I2C_ACK_ENABLE;
 	I2C1Handle.I2C_Config.I2C_SCLSpeed = I2C_SCL_SPEED_SM;
-//	I2C1Handle.I2C_Config.I2C_DeviceAddress =
+//	I2C1Handle.I2C_Config.I2C_DeviceAddress = ??
 	I2C1Handle.I2C_Config.I2C_FMDutyCycle = I2C_FM_DUTY_2;
 	I2C_Init(&I2C1Handle);
 
@@ -45,6 +59,7 @@ int main(void)
 	I2C1_GPIOInits();
 
 	I2C1_Inits();
+	GPIOBtn_Init();
 
 }
 
