@@ -273,6 +273,19 @@ static void I2C_ClearADDRFlag(I2C_RegDef_t* pI2Cx)
 	(void)temp;
 }
 
+void I2C_ManageAcking(I2C_RegDef_t* pI2Cx, uint8_t EnorDi)
+{
+	if (EnorDi == I2C_ACK_EN)
+	{
+		pI2Cx->CR1 |= (1 << I2C_CR1_ACK);
+	}
+	else
+	{
+		pI2Cx->CR1 &= ~(1 << I2C_CR1_ACK);
+	}
+}
+
+
 void I2C_MasterReceiveData(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len, uint8_t SlaveAddr)
 {
 	// 1. Generate start signal (SB)
@@ -281,9 +294,63 @@ void I2C_MasterReceiveData(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t L
 	while (!I2C_GetFlagStatus(pHandle->pI2Cx, I2C_SB_FLAG));
 	// 3. Execute Address Phase for Receiver
 	I2C_ExecuteAddressPhaseRead(pHandle->pI2Cx, SlaveAddr);
+	// 4. Confirm the ADDR bit is set by the slave
+	while (!I2C_GetFlagStatus(pHandle->pI2Cx, I2C_ADDR_FLAG));
 
 	if (Len == 1)
 	{
+		// 5. Manage ACK, turn ACK to 0
+		I2C_ManageAcking(pHandle->pI2Cx, I2C_ACK_DI);
+		// 6. Turn STOP -> 1
+		I2C_GenerateStopSignal(pHandle->pI2Cx);
+		// Clear ADDR Flag
+		I2C_ClearADDRFlag(pHandle->pI2Cx);
+		// Wait until RXNE turn 1
+		while (!I2C_GetFlagStatus(pHandle->pI2Cx, I2C_RXNE_FLAG));
+		// 7. Read DR
+		*pRxBuffer = pHandle->pI2Cx->DR;
+	}
+	else if (Len > 1)
+	{
+		// Clear ADDR Flag
+		I2C_ClearADDRFlag(pHandle->pI2Cx);
+		I2C_ManageAcking(pHandle->pI2Cx, I2C_ACK_EN);
+		while (Len)
+		{
+			// When Len == 2, a special event occurs
+			/*
+			 * Read Data, then do the same as the first case
+			 * ACK->0
+			 * STOP->1
+			 * read DR
+			 */
+			if (Len == 2)
+			{
+				while (!I2C_GetFlagStatus(pHandle->pI2Cx, I2C_RXNE_FLAG));
+				// Read DR
+				*pRxBuffer = pHandle->pI2Cx->DR;
+				Len--;
+				pRxBuffer++;
+				I2C_ManageAcking(pHandle->pI2Cx, I2C_ACK_DI);
+				I2C_GenerateStopSignal(pHandle->pI2Cx);
+				// read DR
+				*pRxBuffer = pHandle->pI2Cx->DR;
+				Len--;
+				pRxBuffer++;
+
+			}
+			else
+			{
+				// 6. Wait until RXNE bit
+				while (!I2C_GetFlagStatus(pHandle->pI2Cx, I2C_RXNE_FLAG));
+				// 7. Read DR
+				*pRxBuffer = pHandle->pI2Cx->DR;
+				Len--;
+				pRxBuffer++;
+				// 5. ACK -> 1
+				I2C_ManageAcking(pHandle->pI2Cx, I2C_ACK_EN);
+			}
+		}
 
 	}
 	// 4. Clear Address bit
@@ -296,9 +363,12 @@ void I2C_MasterReceiveData(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t L
 		pRxBuffer++;
 		Len--;
 	}
-	while (I2C_GetFlagStatus(pHandle->pI2Cx, I2C_RXNE_FLAG));
-	while (!I2C_GetFlagStatus(pHandle->pI2Cx, I2C_BTF_FLAG));
-	I2C_GenerateStopSignal(pHandle->pI2Cx);
+
+	// Reenable the acking
+	if (pHandle->I2C_Config.I2C_ACK == I2C_ACK_ENABLE)
+	{
+		I2C_ManageAcking(pHandle->pI2Cx, I2C_ACK_EN);
+	}
 
 
 }
@@ -312,7 +382,7 @@ void I2C_MasterSendData(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len,
 	// 2. Ensure that SB FLAG is set
 	while (! I2C_GetFlagStatus(pHandle->pI2Cx, I2C_SB_FLAG));
 	// 2. EV5: SB = 1. We will clear it by reading SR1 register
-	// followed by reading SR2 register
+	// followed by reading SR2 register (NOT NEEDED)
 //	I2C_ClearSB(pHandle->pI2Cx);
 	// 3. Send Address
 	I2C_ExecuteAddressPhaseWrite(pHandle->pI2Cx, pHandle->I2C_Config.I2C_DeviceAddress);

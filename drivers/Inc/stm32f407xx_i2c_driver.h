@@ -63,6 +63,12 @@ typedef struct {
 #define I2C_FM_DUTY_2					0
 #define I2C_FM_DUTY_16_9				1
 
+/*
+ * @I2C_ACK_FLAG
+ */
+#define I2C_ACK_EN						1
+#define I2C_ACK_DI						0
+
 
 /*
  * **********************************************************
@@ -145,6 +151,7 @@ void I2C_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi); //Cando
  */
 void I2C_PeripheralControl(I2C_RegDef_t* pI2Cx, uint8_t EnorDi);
 uint8_t I2C_GetFlagStatus(I2C_RegDef_t* pI2Cx, uint8_t FlagName);
+void I2C_ManageAcking(I2C_RegDef_t* pI2Cx, uint8_t EnorDi);
 /*
  * Application callback
  */
