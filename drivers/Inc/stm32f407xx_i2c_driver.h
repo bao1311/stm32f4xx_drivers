@@ -117,7 +117,7 @@ void I2C_PeriClockControl(I2C_RegDef_t* pI2Cx, uint8_t EnorDi);
  * Data send and receive (Blocking version)
  */
 void I2C_MasterSendData(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len, uint8_t SlaveAddr);
-void I2C_MasterReceiveData(I2C_RegDef_t* pI2Cx, uint8_t* pRxBuffer, uint32_t Len);
+void I2C_MasterReceiveData(I2C_Handle_t* pI2Cx, uint8_t* pRxBuffer, uint32_t Len, uint8_t SlaveAddr);
 
 
 /*

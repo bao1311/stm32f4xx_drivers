@@ -203,6 +203,17 @@ static void I2C_GenerateStartSignal(I2C_RegDef_t* pI2Cx)
 	pI2Cx->CR1 |= (1 << I2C_CR1_START);
 }
 
+/*
+ * *******************************
+ * @fn				- I2C_ClearSB
+ * @param[in]		- I2C_RegDef_t*
+ * @return: void
+ * @Note: This function is not needed.
+ * Why? The SB bit is cleared by reading SR1 followed by
+ * write into DR register. We are doing that by checking if the
+ * SB bit is set, then we write into the DR register with the address
+ * of the slave
+ */
 static void I2C_ClearSB(I2C_RegDef_t* pI2Cx)
 {
 	uint32_t temp;
@@ -232,6 +243,37 @@ static void I2C_ClearADDRFlag(I2C_RegDef_t* pI2Cx)
 	(void)temp;
 }
 
+void I2C_MasterReceiveData(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len, uint8_t SlaveAddr)
+{
+	// 1. Generate start signal (SB)
+	I2C_GenerateStartSignal(pHandle->pI2Cx);
+	// 2. Ensure the SB Flag is set
+	while (!I2C_GetFlagStatus(pHandle->pI2Cx, I2C_SB_FLAG));
+	if (Len == 1)
+	{
+
+	}
+	// 3. Send Address
+	I2C_ExecuteAddressPhase(pHandle->pI2Cx, SlaveAddr);
+	// 4. Clear Address bit
+	I2C_ClearADDRFlag(pHandle->pI2Cx);
+	// 5. Receive data
+	while (Len)
+	{
+		while (I2C_GetFlagStatus(pHandle->pI2Cx, I2C_RXNE_FLAG));
+		pHandle->pI2Cx->DR = *pRxBuffer;
+		pRxBuffer++;
+		Len--;
+	}
+	while (I2C_GetFlagStatus(pHandle->pI2Cx, I2C_RXNE_FLAG));
+	while (!I2C_GetFlagStatus(pHandle->pI2Cx, I2C_BTF_FLAG));
+	I2C_GenerateStopSignal(pHandle->pI2Cx);
+
+
+}
+
+
+
 void I2C_MasterSendData(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len, uint8_t SlaveAddr)
 {
 	// 1. Generate start signal
@@ -240,7 +282,7 @@ void I2C_MasterSendData(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len,
 	while (! I2C_GetFlagStatus(pHandle->pI2Cx, I2C_SB_FLAG));
 	// 2. EV5: SB = 1. We will clear it by reading SR1 register
 	// followed by reading SR2 register
-	I2C_ClearSB(pHandle->pI2Cx);
+//	I2C_ClearSB(pHandle->pI2Cx);
 	// 3. Send Address
 	I2C_ExecuteAddressPhase(pHandle->pI2Cx, pHandle->I2C_Config.I2C_DeviceAddress);
 	// 4. Clear SR1 ADDR bit
@@ -251,7 +293,7 @@ void I2C_MasterSendData(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len,
 	{
 		while (! I2C_GetFlagStatus(pHandle->pI2Cx, I2C_TXE_FLAG));
 
-		pHandle->pI2Cx->DR = *pTxBuffer;
+		*pTxBuffer = pHandle->pI2Cx->DR;
 		pTxBuffer++;
 		Len--;
 	}
