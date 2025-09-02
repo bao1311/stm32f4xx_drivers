@@ -502,8 +502,11 @@ uint8_t I2C_MasterSendDataIT(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t
 
 		// Implement code to Generate Start condition
 		I2C_GenerateStartSignal(pHandle->pI2Cx);
+
+		// Enable ITEVTEN and ITBUFEN and ITERREN bit
 		pHandle->pI2Cx->CR2 |= (1 << I2C_CR2_ITEVTEN);
 		pHandle->pI2Cx->CR2 |= (1 << I2C_CR2_ITBUFEN);
+		pHandle->pI2Cx->CR2 |= (1 << I2C_CR2_ITERREN);
 	}
 	return pHandle->TxRxState;
 
