@@ -487,23 +487,28 @@ void I2C_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
 /*
  * Data send and receive (Interrupt version)
  */
-uint8_t I2C_MasterSendDataIT(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len, uint8_t SlaveAddr)
+uint8_t I2C_MasterSendDataIT(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len, uint8_t SlaveAddr, uint8_t Sr)
 {
 	uint8_t busystate = pHandle->TxRxState;
 	// Enable I2C_BUSY_IN_TX state
-	if (pHandle->TxRxState != I2C_BUSY_IN_TX && busystate != I2C_BUSY_IN_RX)
+	if (busystate != I2C_BUSY_IN_TX && busystate != I2C_BUSY_IN_RX)
 	{
 		pHandle->TxRxState = I2C_BUSY_IN_TX;
 		pHandle->TxBuffer = pTxBuffer;
 		pHandle->TxLen = Len;
-//		pHandle->DevAddr =
+		pHandle->DevAddr = SlaveAddr;
+		pHandle->Sr = Sr;
+
+
+		// Implement code to Generate Start condition
+		I2C_GenerateStartSignal(pHandle->pI2Cx);
 		pHandle->pI2Cx->CR2 |= (1 << I2C_CR2_ITEVTEN);
 		pHandle->pI2Cx->CR2 |= (1 << I2C_CR2_ITBUFEN);
 	}
 	return pHandle->TxRxState;
 
 }
-uint8_t I2C_MasterReceiveDataIT(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len,uint8_t SlaveAddr)
+uint8_t I2C_MasterReceiveDataIT(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len, uint8_t SlaveAddr, uint8_t Sr)
 {
 	// Enable I2C_BUSY_IN_RX state
 	if (pHandle->TxRxState != I2C_BUSY_IN_RX)
@@ -515,7 +520,7 @@ uint8_t I2C_MasterReceiveDataIT(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint3
 		pHandle->pI2Cx->CR2 |= (1 << I2C_CR2_ITEVTEN);
 		pHandle->pI2Cx->CR2 |= (1 << I2C_CR2_ITBUFEN);
 	}
-	return pHandle->RxRxState;
+	return pHandle->TxRxState;
 
 }
 
