@@ -516,6 +516,19 @@ typedef struct
 #define IRQ_NO_SPI2				36
 #define IRQ_NO_SPI3				51
 
+/*
+ * IRQ Number of STM32F407 MCU for I2C
+ */
+// I2C1
+#define IRQ_NO_I2C1_EV			31
+#define IRQ_NO_I2C1_ER			32
+// I2C2
+#define IRQ_NO_I2C2_EV			33
+#define IRQ_NO_I2C2_ER			34
+// I2C3
+#define IRQ_NO_I2C3_EV			72
+#define IRQ_NO_I2C3_ER			73
+
 #include "stm32f407xx_gpio_driver.h"
 #include "stm32f407xx_spi_driver.h"
 #include "stm32f407xx_i2c_driver.h"
