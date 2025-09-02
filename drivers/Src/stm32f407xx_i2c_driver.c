@@ -487,14 +487,43 @@ void I2C_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
 /*
  * Data send and receive (Interrupt version)
  */
-uint8_t I2C_MasterSendDataIT(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len)
+uint8_t I2C_MasterSendDataIT(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len, uint8_t SlaveAddr)
 {
+	uint8_t busystate = pHandle->TxRxState;
+	// Enable I2C_BUSY_IN_TX state
+	if (pHandle->TxRxState != I2C_BUSY_IN_TX && busystate != I2C_BUSY_IN_RX)
+	{
+		pHandle->TxRxState = I2C_BUSY_IN_TX;
+		pHandle->TxBuffer = pTxBuffer;
+		pHandle->TxLen = Len;
+//		pHandle->DevAddr =
+		pHandle->pI2Cx->CR2 |= (1 << I2C_CR2_ITEVTEN);
+		pHandle->pI2Cx->CR2 |= (1 << I2C_CR2_ITBUFEN);
+	}
+	return pHandle->TxRxState;
 
 }
-uint8_t I2C_MasterReceiveDataIT(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len)
+uint8_t I2C_MasterReceiveDataIT(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len,uint8_t SlaveAddr)
 {
+	// Enable I2C_BUSY_IN_RX state
+	if (pHandle->TxRxState != I2C_BUSY_IN_RX)
+	{
+		pHandle->TxRxState = I2C_BUSY_IN_RX;
+		pHandle->TxBuffer = pRxBuffer;
+		pHandle->TxLen = Len;
+//		pHandle->DevAddr =
+		pHandle->pI2Cx->CR2 |= (1 << I2C_CR2_ITEVTEN);
+		pHandle->pI2Cx->CR2 |= (1 << I2C_CR2_ITBUFEN);
+	}
+	return pHandle->RxRxState;
 
 }
+
+/*
+ * IRQ Configuration and ISR Handling
+ */
+void I2C_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority); // Cando
+void I2C_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi); //Cando
 
 
 /*

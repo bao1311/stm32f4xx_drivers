@@ -137,8 +137,8 @@ void I2C_MasterReceiveData(I2C_Handle_t* pI2Cx, uint8_t* pRxBuffer, uint32_t Len
 /*
  * Data send and receive (Interrupt version)
  */
-uint8_t I2C_MasterSendDataIT(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len);
-uint8_t I2C_MasterReceiveDataIT(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len);
+uint8_t I2C_MasterSendDataIT(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len, uint8_t* SlaveAddr);
+uint8_t I2C_MasterReceiveDataIT(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len, uint8_t* SlaveAddr);
 /*                     /
  * I2C Application/ States Macros
  */
