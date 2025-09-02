@@ -214,6 +214,7 @@ static void I2C_GenerateStartSignal(I2C_RegDef_t* pI2Cx)
  * SB bit is set, then we write into the DR register with the address
  * of the slave
  */
+/*
 static void I2C_ClearSB(I2C_RegDef_t* pI2Cx)
 {
 	uint32_t temp;
@@ -222,6 +223,7 @@ static void I2C_ClearSB(I2C_RegDef_t* pI2Cx)
 	(void)temp;
 
 }
+*/
 
 /*
  * *************************************
