@@ -48,7 +48,7 @@ void GPIOBtn_Init(void)
 void I2C1_Inits(void)
 {
 	I2C1Handle.pI2Cx = I2C1;
-	I2C1Handle.I2C_Config.I2C_ACK = I2C_ACK_ENABLE;
+	I2C1Handle.I2C_Config.I2C_AckControl = I2C_ACK_ENABLE;
 	I2C1Handle.I2C_Config.I2C_SCLSpeed = I2C_SCL_SPEED_SM;
 	I2C1Handle.I2C_Config.I2C_DeviceAddress = MY_ADDRESS;
 	I2C1Handle.I2C_Config.I2C_FMDutyCycle = I2C_FM_DUTY_2;

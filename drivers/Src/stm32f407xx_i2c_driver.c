@@ -86,7 +86,7 @@ void I2C_Init(I2C_Handle_t* pI2CHandle)
 	I2C_PeriClockControl(pI2CHandle->pI2Cx, ENABLE);
 	// Configure CR1 register of I2C
 	// ack control bit
-	tempreg |= (pI2CHandle->I2C_Config.I2C_ACK << I2C_CR1_ACK);
+	tempreg |= (pI2CHandle->I2C_Config.I2C_AckControl << I2C_CR1_ACK);
 	pI2CHandle->pI2Cx->CR1 = tempreg;
 	// Configure CR2 register of I2C
 	// configurethe freq field of CR2
@@ -400,7 +400,7 @@ void I2C_MasterReceiveData(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t L
 	}
 
 	// Reenable the acking
-	if (pHandle->I2C_Config.I2C_ACK == I2C_ACK_ENABLE)
+	if (pHandle->I2C_Config.I2C_AckControl == I2C_ACK_ENABLE)
 	{
 		I2C_ManageAcking(pHandle->pI2Cx, I2C_ACK_EN);
 	}
@@ -612,6 +612,38 @@ void I2C_MasterHandleTXEInterrupt(I2C_Handle_t* pI2CHandle)
 	}
 
 }
+
+void I2C_CloseSendData(I2C_Handle_t* pI2CHandle)
+{
+	/*
+	 * Disable the interrupt first
+	 */
+	// For TXE, we have to disable ITEVTEN and ITBUFEN
+	pI2CHandle->pI2Cx->CR2 &= ~(1 << I2C_CR2_ITEVTEN);
+	pI2CHandle->pI2Cx->CR2 &= ~(1 << I2C_CR2_ITBUFEN);
+	pI2CHandle->RxBuffer = NULL;
+	pI2CHandle->RxLen = 0;
+	pI2CHandle->RxSize = 0;
+	pI2CHandle->TxRxState = I2C_READY;
+	if (pI2CHandle->I2C_Config.I2C_AckControl == I2C_ACK_ENABLE)
+	{
+		I2C_ManageAcking(pI2CHandle->pI2Cx, ENABLE);
+	}
+}
+void I2C_CloseReceiveData(I2C_Handle_t* pI2CHandle)
+{
+	/*
+	 * Disable the interrupt first
+	 */
+	// For RXNE, we have to disable ITEVTEN and ITBUFEN
+	pI2CHandle->pI2Cx->CR2 &= ~(1 << I2C_CR2_ITEVTEN);
+	pI2CHandle->pI2Cx->CR2 &= ~(1 << I2C_CR2_ITBUFEN);
+
+	pI2CHandle->TxBuffer = NULL;
+	pI2CHandle->TxLen = 0;
+	pI2CHandle->TxRxState = I2C_READY;
+
+}
 void I2C_MasterHandleRXNEInterrupt(I2C_Handle_t* pI2CHandle)
 {
 	// RxNE is set
@@ -656,7 +688,7 @@ void I2C_MasterHandleRXNEInterrupt(I2C_Handle_t* pI2CHandle)
 				I2C_GenerateStopSignal(pI2CHandle->pI2Cx);
 			}
 			// Close the I2C communication
-			I2C_CloseReceiveData();
+			I2C_CloseReceiveData(pI2CHandle);
 			// Event call back
 			I2C_ApplicationEventCallback(pI2CHandle, I2C_EV_RX_CMPLT);
 		}
@@ -738,7 +770,7 @@ void I2C_EV_IRQHandling(I2C_Handle_t* pI2CHandle)
 						I2C_GenerateStopSignal(pI2CHandle->pI2Cx);
 					}
 
-					I2C_CloseSendData();
+					I2C_CloseSendData(pI2CHandle);
 					I2C_ApplicationEventCallback(pI2CHandle, I2C_EV_TX_CMPLT);
 				}
 			}

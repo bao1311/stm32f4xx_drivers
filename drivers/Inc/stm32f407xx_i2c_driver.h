@@ -14,7 +14,7 @@
 typedef struct {
 	uint32_t I2C_SCLSpeed;
 	uint8_t I2C_DeviceAddress;
-	uint8_t I2C_ACK;
+	uint8_t I2C_AckControl;
 	uint8_t I2C_FMDutyCycle;
 } I2C_Config_t;
 
