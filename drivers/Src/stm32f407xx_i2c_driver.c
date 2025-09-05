@@ -597,6 +597,74 @@ uint8_t I2C_GetFlagStatus(I2C_RegDef_t* pI2Cx, uint8_t FlagName)
 
 }
 
+
+void I2C_MasterHandleTXEInterrupt(I2C_Handle_t* pI2CHandle)
+{
+	// TxE is set
+	if (pI2CHandle->TxRxState == I2C_BUSY_IN_TX)
+	{
+		if (pI2CHandle->TxLen > 0)
+		{
+			*(pI2CHandle->TxBuffer) = pI2CHandle->pI2Cx->DR;
+			pI2CHandle->TxBuffer++;
+			pI2CHandle->TxLen--;
+		}
+	}
+
+}
+void I2C_MasterHandleRXNEInterrupt(I2C_Handle_t* pI2CHandle)
+{
+	// RxNE is set
+	if (pI2CHandle->TxRxState == I2C_BUSY_IN_RX)
+	{
+
+		if (pI2CHandle->RxLen == 1)
+		{
+			/*
+			 * In case TxLen is equal to 1, we would want to disable
+			 * ACK and turn STOP bit to 1 so Slave won't send
+			 * any extra data
+			 */
+			*(pI2CHandle->RxBuffer) = pI2CHandle->pI2Cx->DR;
+			pI2CHandle->RxLen--;
+		}
+		else if (pI2CHandle->RxLen > 1)
+		{
+			if (pI2CHandle->RxLen == 2)
+			{
+				/*
+				 * When Len is equal to 2
+				 * Read DR,
+				 * ACK -> 0
+				 * STOP -> 1
+				 * Read DR
+				 */
+				// Send NACK
+				I2C_ManageAcking(pI2CHandle->pI2Cx, I2C_ACK_DI);
+
+			}
+
+			*(pI2CHandle->RxBuffer) = pI2CHandle->pI2Cx->DR;
+			pI2CHandle->RxBuffer++;
+			pI2CHandle->RxLen--;
+		}
+		if (pI2CHandle->RxLen == 0)
+		{
+			if (pI2CHandle->Sr == I2C_DISABLE_SR)
+			{
+				// Stop signal generated
+				I2C_GenerateStopSignal(pI2CHandle->pI2Cx);
+			}
+			// Close the I2C communication
+			I2C_CloseReceiveData();
+			// Event call back
+			I2C_ApplicationEventCallback(pI2CHandle, I2C_EV_RX_CMPLT);
+		}
+
+	}
+
+}
+
 /*
  * *****************************************
  * @fn					- I2C_EV_IRQHandling
@@ -700,17 +768,7 @@ void I2C_EV_IRQHandling(I2C_Handle_t* pI2CHandle)
 	{
 		if (pI2CHandle->pI2Cx->SR2 & (1 << I2C_SR2_MSL))
 		{
-
-			// TxE is set
-			if (pI2CHandle->TxRxState == I2C_BUSY_IN_TX)
-			{
-				if (pI2CHandle->TxLen > 0)
-				{
-					*(pI2CHandle->TxBuffer) = pI2CHandle->pI2Cx->DR;
-					pI2CHandle->TxBuffer++;
-					pI2CHandle->TxLen--;
-				}
-			}
+			I2C_MasterHandleTXEInterrupt(pI2CHandle);
 		}
 
 	}
@@ -718,59 +776,10 @@ void I2C_EV_IRQHandling(I2C_Handle_t* pI2CHandle)
 	temp3 = pI2CHandle->pI2Cx->SR1 & (1 << I2C_SR1_RxNE);
 	if (temp1 & temp2 & temp3)
 	{
-
-		// RxNE is set
-		if (pI2CHandle->TxRxState == I2C_BUSY_IN_RX)
+		if (pI2CHandle->pI2Cx->SR2 & (I2C_SR2_MSL))
 		{
 
-			if (pI2CHandle->RxLen == 1)
-			{
-				/*
-				 * In case TxLen is equal to 1, we would want to disable
-				 * ACK and turn STOP bit to 1 so Slave won't send
-				 * any extra data
-				 */
-				I2C_ManageAcking(pI2CHandle->pI2Cx, I2C_ACK_DI);
-				I2C_GenerateStopSignal(pI2CHandle->pI2Cx);
-				while (!I2C_GetFlagStatus(pI2CHandle->pI2Cx, I2C_RXNE_FLAG));
-				*(pI2CHandle->RxBuffer) = pI2CHandle->pI2Cx->DR;
-				pI2CHandle->RxBuffer++;
-				pI2CHandle->RxLen--;
-			}
-			else if (pI2CHandle->RxLen > 1)
-			{
-				if (pI2CHandle->RxLen == 2)
-				{
-					/*
-					 * When Len is equal to 2
-					 * Read DR,
-					 * ACK -> 0
-					 * STOP -> 1
-					 * Read DR
-					 */
-					*(pI2CHandle->RxBuffer) = pI2CHandle->pI2Cx->DR;
-					pI2CHandle->RxBuffer++;
-					pI2CHandle->RxLen--;
-					// Send NACK
-					I2C_ManageAcking(pI2CHandle->pI2Cx, I2C_ACK_DI);
-					// STOP->1
-					I2C_GenerateStopSignal(pI2CHandle->pI2Cx);
-					// Read the last byte
-					*(pI2CHandle->RxBuffer) = pI2CHandle->pI2Cx->DR;
-					pI2CHandle->RxBuffer++;
-					pI2CHandle->RxLen--;
-
-				}
-				else if (pI2CHandle->RxLen > 2)
-				{
-					*(pI2CHandle->RxBuffer) = pI2CHandle->pI2Cx->DR;
-					pI2CHandle->RxBuffer++;
-					pI2CHandle->RxLen--;
-					I2C_ManageAcking(pI2CHandle->pI2Cx, I2C_ACK_EN);
-
-				}
-
-			}
+			I2C_MasterHandleRXNEInterrupt(pI2CHandle);
 		}
 	}
 
