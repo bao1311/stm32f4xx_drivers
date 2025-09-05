@@ -77,6 +77,18 @@ typedef struct {
 #define I2C_ACK_EN						1
 #define I2C_ACK_DI						0
 
+/*
+ * @I2C_SR
+ */
+#define I2C_DISABLE_SR					0
+#define I2C_ENABLE_SR					1
+
+/*
+ * @I2C_EV
+ */
+#define I2C_EV_RX_CMPLT					0
+#define I2C_EV_TX_CMPLT					1
+#define I2C_EV_STOP						2
 
 /*
  * **********************************************************
