@@ -6,13 +6,33 @@
  */
 
 #include "stm32f407xx_i2c_driver.h"
+#include "stm32f407xx.h"
 #include "string.h"
+#include "stm32f407xx_gpio_driver.h"
 
 #define CMD_READ_LEN_DATA 		0x51
 #define CMD_READ_CMPLT_DATA 	0x52
 
-void GPIO_Init()
+
+I2C_Handle_t pI2CHandle;
+GPIO_Handle_t GPIOHandle;
+void GPIOInit()
 {
+	// SCL -> PB6
+	// SDA -> PB7
+	GPIOHandle.GPIO_PinConfig.GPIO_PinAltFunMode = 4;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_ALTFN;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_PP;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_NO_PUPD;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
+
+	// Configure pin for SCL => PB6
+	GPIOHandle.GPIO_PinConfig.GPIO_PinNumber = 6;
+	GPIO_Init(&GPIOHandle);
+
+	// Configure pin for SDA => PB7
+	GPIOHandle.GPIO_PinConfig.GPIO_PinNumber = 7;
+	GPIO_Init(&GPIOHandle);
 
 }
 
@@ -22,7 +42,7 @@ int main()
 	// GPIO Init for SCL, SDA line
 	// SCL->PB6
 	// SDA->PB7
-	GPIO_Init();
+	GPIOInit();
 
 
 	// Enable I2C Peripheral
