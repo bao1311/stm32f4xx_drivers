@@ -47,9 +47,10 @@ int main()
 
 	// Enable I2C Peripheral
 	I2C_PeriClockControl(I2C1, ENABLE);
+	char* txBuffer = {"0x52"};
 
 	// Master send command code 0x51 to read length data from Slave
-	I2C_MasterSendData(pHandle, pTxBuffer, Len, SlaveAddr);
+	I2C_MasterSendData(&pI2CHandle, txBuffer, strlen(txBuffer), SlaveAddr)
 
 	// Close Send Data
 	I2C_CloseSendData(pI2CHandle);
