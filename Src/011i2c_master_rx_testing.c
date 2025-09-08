@@ -98,7 +98,11 @@ int main()
 		// Master receive length data from slave
 		I2C_MasterReceiveData(pI2CHandle, &Len, 1, SLAVE_ADDRESS);
 
-		uint8_t* rcv_buf = {};
+		// Master send 0x52 to receive the data from slave
+		commandCode = 0x52;
+		I2C_MasterSendData(pI2CHandle, &commandCode, 1, SLAVE_ADDRESS);
+
+		uint8_t rcv_buf[32];
 		// Master read complete data from slave
 		I2C_MasterReceiveData(pI2CHandle, rcv_buf, Len, SLAVE_ADDRESS);
 
