@@ -16,16 +16,17 @@
 #define SLAVE_ADDRESS			0x68
 #define MY_ADDRESS 				0x61
 
-I2C_Handle_t* pI2CHandle;
+I2C_Handle_t I2CHandle;
 GPIO_Handle_t GPIOHandle;
 void I2C1_GPIOInit()
 {
+	GPIOHandle.pGPIOx = GPIOB;
 	// SCL -> PB6
 	// SDA -> PB7
 	GPIOHandle.GPIO_PinConfig.GPIO_PinAltFunMode = 4;
 	GPIOHandle.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_ALTFN;
-	GPIOHandle.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_PP;
-	GPIOHandle.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_NO_PUPD;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_OD;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_PIN_PU;
 	GPIOHandle.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
 
 	// Configure pin for SCL => PB6
@@ -54,16 +55,16 @@ void GPIOBtn_Init(void)
 
 void I2C1_Inits()
 {
-	pI2CHandle->pI2Cx = I2C1;
-	pI2CHandle->I2C_Config.I2C_AckControl = I2C_ACK_ENABLE;
-	pI2CHandle->I2C_Config.I2C_DeviceAddress = MY_ADDRESS;
-	pI2CHandle->I2C_Config.I2C_FMDutyCycle = I2C_FM_DUTY_2;
-	pI2CHandle->I2C_Config.I2C_SCLSpeed = I2C_SCL_SPEED_SM;
-	I2C_Init(pI2CHandle);
+	I2CHandle.pI2Cx = I2C1;
+	I2CHandle.I2C_Config.I2C_AckControl = I2C_ACK_ENABLE;
+	I2CHandle.I2C_Config.I2C_DeviceAddress = MY_ADDRESS;
+	I2CHandle.I2C_Config.I2C_FMDutyCycle = I2C_FM_DUTY_2;
+	I2CHandle.I2C_Config.I2C_SCLSpeed = I2C_SCL_SPEED_SM;
+	I2C_Init(&I2CHandle);
 }
 void delay()
 {
-	for (int i = 0; i < 5000000; ++i)
+	for (int i = 0; i < 100000; ++i)
 	{
 		;
 	}
@@ -81,7 +82,9 @@ int main()
 	// I2C1 Init code
 	I2C1_Inits();
 	// Enable I2C Peripheral
-	I2C_PeriClockControl(I2C1, ENABLE);
+//	I2C_PeriClockControl(I2C1, ENABLE);
+	I2C_PeripheralControl(I2CHandle.pI2Cx, ENABLE);
+
 
 	while (1)
 	{
@@ -90,24 +93,24 @@ int main()
 		delay();
 		// Master send command code 0x51 to read length data from Slave
 		uint8_t commandCode = 0x51;
-		I2C_MasterSendData(pI2CHandle, &commandCode, 1, SLAVE_ADDRESS);
+		I2C_MasterSendData(&I2CHandle, &commandCode, 1, SLAVE_ADDRESS);
 
 		// Close Send Data
-		I2C_CloseSendData(pI2CHandle);
+		I2C_CloseSendData(&I2CHandle);
 		uint8_t Len = 0;
 		// Master receive length data from slave
-		I2C_MasterReceiveData(pI2CHandle, &Len, 1, SLAVE_ADDRESS);
+		I2C_MasterReceiveData(&I2CHandle, &Len, 1, SLAVE_ADDRESS);
 
 		// Master send 0x52 to receive the data from slave
 		commandCode = 0x52;
-		I2C_MasterSendData(pI2CHandle, &commandCode, 1, SLAVE_ADDRESS);
+		I2C_MasterSendData(&I2CHandle, &commandCode, 1, SLAVE_ADDRESS);
 
 		uint8_t rcv_buf[32];
 		// Master read complete data from slave
-		I2C_MasterReceiveData(pI2CHandle, rcv_buf, Len, SLAVE_ADDRESS);
+		I2C_MasterReceiveData(&I2CHandle, rcv_buf, Len, SLAVE_ADDRESS);
 
 		// Close Receive Data
-		I2C_CloseReceiveData(pI2CHandle);
+		I2C_CloseReceiveData(&I2CHandle);
 	}
 
 }

@@ -83,7 +83,9 @@ uint32_t RCC_GetPCLK1Value()
 void I2C_Init(I2C_Handle_t* pI2CHandle)
 {
 	uint32_t tempreg = 0;
+
 	I2C_PeriClockControl(pI2CHandle->pI2Cx, ENABLE);
+
 	// Configure CR1 register of I2C
 	// ack control bit
 	tempreg |= (pI2CHandle->I2C_Config.I2C_AckControl << I2C_CR1_ACK);
@@ -420,7 +422,7 @@ void I2C_MasterSendData(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len,
 	// followed by reading SR2 register (NOT NEEDED)
 //	I2C_ClearSB(pHandle->pI2Cx);
 	// 3. Send Address
-	I2C_ExecuteAddressPhaseWrite(pHandle->pI2Cx, pHandle->I2C_Config.I2C_DeviceAddress);
+	I2C_ExecuteAddressPhaseWrite(pHandle->pI2Cx, SlaveAddr);
 	// 4. Clear SR1 ADDR bit
 	I2C_ClearADDRFlag(pHandle);
 	// 4. Acknowledge will be done by the receiver (ACK/NACK)
@@ -429,7 +431,7 @@ void I2C_MasterSendData(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len,
 	{
 		while (! I2C_GetFlagStatus(pHandle->pI2Cx, I2C_TXE_FLAG));
 
-		*pTxBuffer = pHandle->pI2Cx->DR;
+		pHandle->pI2Cx->DR = *pTxBuffer;
 		pTxBuffer++;
 		Len--;
 	}
