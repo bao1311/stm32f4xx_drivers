@@ -179,7 +179,18 @@ void USART_EV_IRQHandling(USART_Handle_t* pUSARTHandle);
 /*
  * Other Peripheral Control APIs
  */
-void USART_PeripheralControl(USART_RegDef_t* pUSARTx, uint8_t EnorDi);
+void USART_PeripheralControl(USART_RegDef_t* pUSARTx, uint8_t EnorDi)
+{
+	if (EnorDi == ENABLE)
+	{
+		pUSARTx->CR1 |= (1 << USART_CR1_UE);
+	}
+	else
+	{
+		pUSARTx->CR1 &= ~(1 << USART_CR1_UE);
+	}
+
+}
 uint8_t USART_GetFlagStatus(USART_RegDef_t* pUSARTx, uint8_t FlagName);
 void USART_ManageAcking(USART_RegDef_t* pUSARTx, uint8_t EnorDi);
 
