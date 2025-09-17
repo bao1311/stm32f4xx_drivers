@@ -155,6 +155,24 @@
 #define I2C_CCR_FS				15
 
 /*
+ * ******************************************
+ * Bit position of USART peripheral
+ * ******************************************
+ */
+// USART_SR register
+#define USART_SR_PE				0
+#define USART_SR_FE				1
+#define USART_SR_NF				2
+#define USART_SR_ORE			3
+#define USART_SR_IDLE			4
+#define USART_SR_RXNE			5
+#define USART_SR_TC				6
+#define USART_SR_TXE			7
+#define USART_SR_LBD			8
+#define USART_SR_CTS			9
+
+// USART_DR register
+/*
  *
  *********************************************************
  *Bit position definitions of SPI peripheral
