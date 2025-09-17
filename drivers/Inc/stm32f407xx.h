@@ -174,6 +174,22 @@
 // USART_DR register
 #define USART_DR_DIV_Fraction	0
 #define USART_DR_DIV_Mantissa	4
+// USART_CR1 register
+#define USART_CR1_SBK			0
+#define USART_CR1_RWU			1
+#define USART_CR1_RE			2
+#define USART_CR1_TE			3
+#define USART_CR1_IDLEIE		4
+#define USART_CR1_RXNEIE		5
+#define USART_CR1_TCIE			6
+#define USART_CR1_TXEIE			7
+#define USART_CR1_PEIE			8
+#define USART_CR1_PS			9
+#define USART_CR1_PCE			10
+#define USART_CR1_WAKE			11
+#define USART_CR1_M				12
+#define USART_CR1_UE			13
+#define USART_CR1_OVER8			15
 /*
  *
  *********************************************************
