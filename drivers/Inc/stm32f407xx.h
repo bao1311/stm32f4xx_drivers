@@ -172,6 +172,8 @@
 #define USART_SR_CTS			9
 
 // USART_DR register
+#define USART_DR_DIV_Fraction	0
+#define USART_DR_DIV_Mantissa	4
 /*
  *
  *********************************************************
