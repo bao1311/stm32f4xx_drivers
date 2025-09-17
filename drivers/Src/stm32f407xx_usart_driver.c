@@ -61,8 +61,8 @@ void USART_Init(USART_Handle_t* pUSARTHandle)
 	tempreg = 0;
 	if (pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_CTRL_EN)
 	{
-		temreg |= (1 << USART_CR3_RTSE);
-		temreg |= (1 << USART_CR3_CTSE);
+		tempreg |= (1 << USART_CR3_RTSE);
+		tempreg |= (1 << USART_CR3_CTSE);
 	}
 	pUSARTHandle->pUSARTx->CR3 |= tempreg;
 
@@ -85,7 +85,7 @@ void USART_DeInit(USART_RegDef_t* pUSARTx); 		// Cando
 
 void USART_PeriClockControl(USART_RegDef_t* pUSARTx, uint8_t EnorDi)
 {
-	if (EnorDi == USART_CLK_EN)
+	if (EnorDi == ENABLE)
 	{
 		if (pUSARTx == USART1)
 		{
@@ -172,8 +172,59 @@ void USART_CloseReceiveData(USART_Handle_t* pUSARTHandle);
 /*
  * IRQ Configuration and ISR Handling
  */
-void USART_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority); // Cando
-void USART_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi); //Cando
+void USART_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
+{
+	uint8_t iprx = IRQNumber / 4;
+	uint8_t iprx_section = IRQNumber % 4;
+	uint8_t shiftedAmt = 8 * iprx_section + (8 - NO_PR_BITS_IMPLEMENTED);
+	*(NVIC_PR_BASEADDR + iprx) |= (IRQPriority) << (shiftedAmt);
+}
+void USART_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi) //Cando
+{
+	if (EnorDi == ENABLE)
+	{
+		uint8_t pos = IRQNumber % 32;
+		uint8_t offset = IRQNumber / 32;
+		if (offset == 0)
+		{
+			*NVIC_ISER0 |= (1 << pos);
+		}
+		else if (offset == 1)
+		{
+			*NVIC_ISER1 |= (1 << pos);
+		}
+		else if (offset == 2)
+		{
+			*NVIC_ISER2 |= (1 << pos);
+		}
+		else if (offset == 3)
+		{
+			*NVIC_ISER3 |= (1 << pos);
+		}
+	}
+	else
+	{
+		uint8_t pos = IRQNumber % 32;
+		uint8_t offset = IRQNumber / 32;
+		if (offset == 0)
+		{
+			*NVIC_ISER0 &= ~(1 << pos);
+		}
+		else if (offset == 1)
+		{
+			*NVIC_ISER1 &= ~(1 << pos);
+		}
+		else if (offset == 2)
+		{
+			*NVIC_ISER2 &= ~(1 << pos);
+		}
+		else if (offset == 3)
+		{
+			*NVIC_ISER3 &= ~(1 << pos);
+		}
+
+	}
+}
 void USART_EV_IRQHandling(USART_Handle_t* pUSARTHandle);
 
 /*
