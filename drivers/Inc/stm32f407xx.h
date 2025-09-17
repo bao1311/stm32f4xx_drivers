@@ -205,6 +205,23 @@
 #define USART_CR2_STOP			12
 #define USART_CR2_LINEN			14
 
+// USART_CR3 register
+#define USART_CR3_EIE			0
+#define USART_CR3_IREN			1
+#define USART_CR3_IRLP			2
+#define USART_CR3_HDSEL			3
+#define USART_CR3_NACK			4
+#define USART_CR3_SCEN			5
+#define USART_CR3_DMAR			6
+#define USART_CR3_DMAT			7
+#define USART_CR3_RTSE			8
+#define USART_CR3_CTSE			9
+#define USART_CR3_CTSIE			10
+#define USART_CR3_ONEBIT		11
+
+// USART_GTPR
+#define USART_GTPR_PSC			0
+#define USART_GTPR_GT			7
 /*
  *
  *********************************************************
