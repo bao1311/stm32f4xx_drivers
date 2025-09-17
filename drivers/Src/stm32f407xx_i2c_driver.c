@@ -85,11 +85,12 @@ void I2C_Init(I2C_Handle_t* pI2CHandle)
 	uint32_t tempreg = 0;
 
 	I2C_PeriClockControl(pI2CHandle->pI2Cx, ENABLE);
+	I2C_PeripheralControl(pI2CHandle->pI2Cx, ENABLE);
 
 	// Configure CR1 register of I2C
 	// ack control bit
 	tempreg |= (pI2CHandle->I2C_Config.I2C_AckControl << I2C_CR1_ACK);
-	pI2CHandle->pI2Cx->CR1 = tempreg;
+	pI2CHandle->pI2Cx->CR1 |= tempreg;
 	// Configure CR2 register of I2C
 	// configurethe freq field of CR2
 	tempreg = 0;
@@ -99,7 +100,7 @@ void I2C_Init(I2C_Handle_t* pI2CHandle)
 	tempreg = 0;
 	tempreg |= (1 << 14);
 	tempreg |= (pI2CHandle->I2C_Config.I2C_DeviceAddress << 1);
-	pI2CHandle->pI2Cx->OAR1 = tempreg;
+	pI2CHandle->pI2Cx->OAR1 |= tempreg;
 	// Configure the CCR register of I2C
 	tempreg = 0;
 	uint16_t ccr = 0;
@@ -147,7 +148,7 @@ void I2C_Init(I2C_Handle_t* pI2CHandle)
 		// Fast mode trise
 		trise = ((RCC_GetPCLK1Value() * 3) / 10000000U) + 1;
 	}
-	tempreg |= (trise & 0x3F);
+	tempreg = (trise & 0x3F);
 	pI2CHandle->pI2Cx->TRISE = tempreg;
 }
 
@@ -245,7 +246,7 @@ static void I2C_ExecuteAddressPhaseWrite(I2C_RegDef_t* pI2Cx, uint8_t SlaveAddre
 	address |= (SlaveAddress << 1);
 	// read/write bit == 0 => Transmitter
 	address &= ~(1);
-	pI2Cx->DR |= address;
+	pI2Cx->DR = address;
 }
 
 /*
@@ -264,7 +265,7 @@ static void I2C_ExecuteAddressPhaseRead(I2C_RegDef_t* pI2Cx, uint8_t SlaveAddres
 	address |= (SlaveAddress << 1);
 	// read/write bit == 1 => Receiver
 	address |= 1;
-	pI2Cx->DR |= address;
+	pI2Cx->DR = address;
 }
 //void I2C_Ack(I2C_Handle_t* pHandle)
 //{
@@ -279,7 +280,7 @@ static void I2C_ClearADDRFlag(I2C_Handle_t* pI2CHandle)
 	 * 2. RxLen > 1
 	 */
 	uint8_t dummyRead;
-	if (pI2CHandle->pI2Cx->CR2 & (1 << I2C_SR2_MSL))
+	if (pI2CHandle->pI2Cx->SR2 & (1 << I2C_SR2_MSL))
 	{
 		// Master mode
 		if (pI2CHandle->TxRxState == I2C_BUSY_IN_RX)
@@ -336,12 +337,13 @@ void I2C_MasterReceiveData(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t L
 
 	if (Len == 1)
 	{
+
 		// 5. Manage ACK, turn ACK to 0
 		I2C_ManageAcking(pHandle->pI2Cx, I2C_ACK_DI);
-		// 6. Turn STOP -> 1
-		I2C_GenerateStopSignal(pHandle->pI2Cx);
 		// Clear ADDR Flag
 		I2C_ClearADDRFlag(pHandle);
+		// 6. Turn STOP -> 1
+		I2C_GenerateStopSignal(pHandle->pI2Cx);
 		// Wait until RXNE turn 1
 		while (!I2C_GetFlagStatus(pHandle->pI2Cx, I2C_RXNE_FLAG));
 		// 7. Read DR
@@ -414,22 +416,29 @@ void I2C_MasterReceiveData(I2C_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t L
 
 void I2C_MasterSendData(I2C_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len, uint8_t SlaveAddr)
 {
+    pHandle->pI2Cx->CR2 &= ~((1<<I2C_CR2_ITEVTEN)|(1<<I2C_CR2_ITBUFEN)|(1<<I2C_CR2_ITERREN));
+
 	// 1. Generate start signal
 	I2C_GenerateStartSignal(pHandle->pI2Cx);
 	// 2. Ensure that SB FLAG is set
 	while (! I2C_GetFlagStatus(pHandle->pI2Cx, I2C_SB_FLAG));
 	// 2. EV5: SB = 1. We will clear it by reading SR1 register
-	// followed by reading SR2 register (NOT NEEDED)
+	// followed by reading DR register (NOT NEEDED)
 //	I2C_ClearSB(pHandle->pI2Cx);
+
+//	while ( !(I2C_GetFlagStatus(pHandle->pI2Cx, I2C_TXE_FLAG) == 1))se ;
 	// 3. Send Address
 	I2C_ExecuteAddressPhaseWrite(pHandle->pI2Cx, SlaveAddr);
+	//4. Confirm that address phase is completed by checking the ADDR flag in the SR1
+	while (!(pHandle->pI2Cx->SR1 & (1 << I2C_SR1_ADDR))) {}
 	// 4. Clear SR1 ADDR bit
 	I2C_ClearADDRFlag(pHandle);
 	// 4. Acknowledge will be done by the receiver (ACK/NACK)
 	// 5. Send data while Len > 0
 	while (Len > 0)
 	{
-		while (! I2C_GetFlagStatus(pHandle->pI2Cx, I2C_TXE_FLAG));
+		// Wait until txe bit is set to 1
+		while ( (I2C_GetFlagStatus(pHandle->pI2Cx, I2C_TXE_FLAG) != 1));
 
 		pHandle->pI2Cx->DR = *pTxBuffer;
 		pTxBuffer++;

@@ -18,6 +18,8 @@
 
 I2C_Handle_t I2CHandle;
 GPIO_Handle_t GPIOHandle;
+extern void initialise_monitor_handles();
+
 void I2C1_GPIOInit()
 {
 	GPIOHandle.pGPIOx = GPIOB;
@@ -60,6 +62,8 @@ void I2C1_Inits()
 	I2CHandle.I2C_Config.I2C_DeviceAddress = MY_ADDRESS;
 	I2CHandle.I2C_Config.I2C_FMDutyCycle = I2C_FM_DUTY_2;
 	I2CHandle.I2C_Config.I2C_SCLSpeed = I2C_SCL_SPEED_SM;
+
+//	I2C_PeripheralControl(I2CHandle.pI2Cx, ENABLE);
 	I2C_Init(&I2CHandle);
 }
 void delay()
@@ -80,10 +84,13 @@ int main()
 	// GPIO Button pin init
 	GPIOBtn_Init();
 	// I2C1 Init code
+	initialise_monitor_handles();
+
+	// Enable PE right here
+	// Only after we enable that, we are allowed to modify the peripheral register
 	I2C1_Inits();
 	// Enable I2C Peripheral
 //	I2C_PeriClockControl(I2C1, ENABLE);
-	I2C_PeripheralControl(I2CHandle.pI2Cx, ENABLE);
 
 
 	while (1)
@@ -96,7 +103,7 @@ int main()
 		I2C_MasterSendData(&I2CHandle, &commandCode, 1, SLAVE_ADDRESS);
 
 		// Close Send Data
-		I2C_CloseSendData(&I2CHandle);
+//		I2C_CloseSendData(&I2CHandle);
 		uint8_t Len = 0;
 		// Master receive length data from slave
 		I2C_MasterReceiveData(&I2CHandle, &Len, 1, SLAVE_ADDRESS);
@@ -105,12 +112,13 @@ int main()
 		commandCode = 0x52;
 		I2C_MasterSendData(&I2CHandle, &commandCode, 1, SLAVE_ADDRESS);
 
-		uint8_t rcv_buf[32];
+		uint8_t rcv_buf[100];
 		// Master read complete data from slave
 		I2C_MasterReceiveData(&I2CHandle, rcv_buf, Len, SLAVE_ADDRESS);
-
+		rcv_buf[Len+1] = '\0';
+		printf("Data is: %s\n", rcv_buf);
 		// Close Receive Data
-		I2C_CloseReceiveData(&I2CHandle);
+//		I2C_CloseReceiveData(&I2CHandle);
 	}
 
 }
