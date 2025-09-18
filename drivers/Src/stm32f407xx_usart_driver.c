@@ -21,16 +21,18 @@ void USART_Init(USART_Handle_t* pUSARTHandle)
 	// Set up USART_MODE
 	if (pUSARTHandle->USART_Config.USART_Mode == USART_MODE_TX)
 	{
-
+		tempreg |= (1 << USART_CR1_TE);
 	}
 	else if (pUSARTHandle->USART_Config.USART_Mode == USART_MODE_RX)
 	{
-
+		tempreg |= (1 << USART_CR1_RE);
 	}
 	else if (pUSARTHandle->USART_Config.USART_Mode == USART_MODE_TXRX)
 	{
-
+		tempreg |= (1 << USART_CR1_TE);
+		tempreg |= (1 << USART_CR1_TE);
 	}
+	pUSARTHandle->pUSARTx->CR1 |= tempreg;
 
 	// Set up USART_Baud
 
@@ -59,44 +61,55 @@ void USART_Init(USART_Handle_t* pUSARTHandle)
 	tempreg = 0;
 	if (pUSARTHandle->USART_Config.USART_WordLength == USART_WORDLEN_8BITS)
 	{
-		tempreg |= (1 << USART_CR1_M);
+		tempreg |= (0 << USART_CR1_M);
 	}
 	else if (pUSARTHandle->USART_Config.USART_WordLength == USART_WORDLEN_9BITS)
 	{
-
+		tempreg |= (1 << USART_CR1_M);
 	}
 	pUSARTHandle->pUSARTx->CR1 |= tempreg;
 	// USART_ParityControl
 	tempreg = 0;
 	if (pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_DI)
 	{
-		tempreg |= (1 << USART_CR1_PCE);
+		tempreg |= (0 << USART_CR1_PCE);
 	}
 	else if (pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_EN_EVEN)
 	{
-
+		// Even Parity
+		tempreg |= (1 << USART_CR1_PCE);
+		tempreg |= (0 << USART_CR1_PS);
 	}
 	else if (pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_EN_ODD)
 	{
-
+		// Odd Parity
+		tempreg |= (1 << USART_CR1_PCE);
+		tempreg |= (1 << USART_CR1_PS);
 	}
+	pUSARTHandle->pUSARTx->CR1 |= tempreg;
+
 	// USART_HWFlowControl
 	tempreg = 0;
 	if (pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_FLOW_CTRL_NONE)
 	{
-		tempreg |= (1 << USART_CR3_RTSE);
-		tempreg |= (1 << USART_CR3_CTSE);
+		tempreg &= ~(1 << USART_CR3_RTSE);
+		tempreg &= ~(1 << USART_CR3_CTSE);
 	}
 	else if (pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_FLOW_CTRL_CTS)
 	{
-
+		// CTS enable
+		tempreg |= (1 << USART_CR3_CTSE);
 	}
 	else if (pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_FLOW_CTRL_RTS)
 	{
-
+		// RTS enable
+		tempreg |= (1 << USART_CR3_RTSE);
 	}
 	else if (pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_FLOW_CTRL_CTS_RTS)
 	{
+		// Both CTS and RTS enable
+		tempreg |= (1 << USART_CR3_CTSE);
+		tempreg |= (1 << USART_CR3_RTSE);
 
 	}
 	pUSARTHandle->pUSARTx->CR3 |= tempreg;
