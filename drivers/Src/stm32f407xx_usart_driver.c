@@ -19,24 +19,36 @@ void USART_Init(USART_Handle_t* pUSARTHandle)
 {
 	uint32_t tempreg = 0;
 	// Set up USART_MODE
+	if (pUSARTHandle->USART_Config.USART_Mode == USART_MODE_TX)
+	{
+
+	}
+	else if (pUSARTHandle->USART_Config.USART_Mode == USART_MODE_RX)
+	{
+
+	}
+	else if (pUSARTHandle->USART_Config.USART_Mode == USART_MODE_TXRX)
+	{
+
+	}
 
 	// Set up USART_Baud
 
 	// Set up USART_NoOfStopBits
 	tempreg = 0;
-	if (pUSARTHandle->USART_Config.USART_NoOfStopBits == USART_STOP_BITS_1)
+	if (pUSARTHandle->USART_Config.USART_NoOfStopBits == USART_STOPBITS_1)
 	{
 		tempreg |= (0 << USART_CR2_STOP);
 	}
-	else if (pUSARTHandle->USART_Config.USART_NoOfStopBits == USART_STOP_BITS_0.5)
+	else if (pUSARTHandle->USART_Config.USART_NoOfStopBits == USART_STOPBITS_0_5)
 	{
 		tempreg |= (1 << USART_CR2_STOP);
 	}
-	else if (pUSARTHandle->USART_Config.USART_NoOfStopBits == USART_STOP_BITS_2)
+	else if (pUSARTHandle->USART_Config.USART_NoOfStopBits == USART_STOPBITS_2)
 	{
 		tempreg |= (2 << USART_CR2_STOP);
 	}
-	else if (pUSARTHandle->USART_Config.USART_NoOfStopBits == USART_STOP_BITS_1.5)
+	else if (pUSARTHandle->USART_Config.USART_NoOfStopBits == USART_STOPBITS_1_5)
 	{
 		tempreg |= (3 << USART_CR2_STOP);
 	}
@@ -45,24 +57,47 @@ void USART_Init(USART_Handle_t* pUSARTHandle)
 
 	// USART_WordLength
 	tempreg = 0;
-	if (pUSARTHandle->USART_Config.USART_WordLength == USART_WORD_LEN_9)
+	if (pUSARTHandle->USART_Config.USART_WordLength == USART_WORDLEN_8BITS)
 	{
 		tempreg |= (1 << USART_CR1_M);
+	}
+	else if (pUSARTHandle->USART_Config.USART_WordLength == USART_WORDLEN_9BITS)
+	{
+
 	}
 	pUSARTHandle->pUSARTx->CR1 |= tempreg;
 	// USART_ParityControl
 	tempreg = 0;
-	if (pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_EN)
+	if (pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_DI)
 	{
 		tempreg |= (1 << USART_CR1_PCE);
 	}
-	pUSARTHandle->pUSARTx->CR1 |= tempreg;
+	else if (pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_EN_EVEN)
+	{
+
+	}
+	else if (pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_EN_ODD)
+	{
+
+	}
 	// USART_HWFlowControl
 	tempreg = 0;
-	if (pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_CTRL_EN)
+	if (pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_FLOW_CTRL_NONE)
 	{
 		tempreg |= (1 << USART_CR3_RTSE);
 		tempreg |= (1 << USART_CR3_CTSE);
+	}
+	else if (pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_FLOW_CTRL_CTS)
+	{
+
+	}
+	else if (pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_FLOW_CTRL_RTS)
+	{
+
+	}
+	else if (pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_FLOW_CTRL_CTS_RTS)
+	{
+
 	}
 	pUSARTHandle->pUSARTx->CR3 |= tempreg;
 
