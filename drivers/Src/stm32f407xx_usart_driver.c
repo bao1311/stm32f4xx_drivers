@@ -242,7 +242,18 @@ void USART_PeripheralControl(USART_RegDef_t* pUSARTx, uint8_t EnorDi)
 	}
 
 }
-uint8_t USART_GetFlagStatus(USART_RegDef_t* pUSARTx, uint8_t FlagName);
+uint8_t USART_GetFlagStatus(USART_RegDef_t* pUSARTx, uint16_t FlagName)
+{
+	if (pUSARTx->SR & FlagName)
+	{
+		return FLAG_SET;
+	}
+	return FLAG_RESET;
+}
+void USART_ClearFlag(USART_RegDef_t* pUSARTx, uint16_t FlagName)
+{
+	pUSARTx->SR &= ~FlagName;
+}
 void USART_ManageAcking(USART_RegDef_t* pUSARTx, uint8_t EnorDi);
 
 /*
