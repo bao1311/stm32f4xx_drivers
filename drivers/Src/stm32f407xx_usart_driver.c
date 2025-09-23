@@ -26,8 +26,37 @@ void USART_SetBaudRate(USART_Handle_t* pUSARTHandle, uint32_t BaudRate)
 {
 	/*
 	 * In order to configure the Fraction and Mantissa of the BRR
-	 * register, we need to figure out the
+	 * register, we need to figure out the USART_DIV
 	 */
+	// APB2: USART1 and USART6
+	// APB1; USART2, USART3, UART4, and UART5
+	uint32_t PCLKx;
+	if (pUSARTHandle->pUSARTx == USART1 || pUSARTHandle->pUSARTx == USART6)
+	{
+		// APB2 bus
+		PCLKx = RCC_GetPCLK2Value();
+	}
+	else
+	{
+		// APB1 bus
+		PCLKx = RCC_GetPCLK1Value();
+	}
+	// Fraction part
+	uint8_t F;
+	// Mantissa part
+	uint16_t M;
+	// USARTDIV part
+	uint32_t USARTDIV;
+	// OVER8 bit
+	uint8_t OVER8 = pUSARTHandle->pUSARTx->CR1 & (1 << USART_CR1_OVER8);
+	// Calculate USARTDIV
+
+	// Calculate Fraction part (F)
+
+	// Calculate Mantissa part (M)
+
+	// Set up the BRR register
+
 }
 /******************************************
  * @fn			- USART_Init
@@ -59,7 +88,7 @@ void USART_Init(USART_Handle_t* pUSARTHandle)
 	pUSARTHandle->pUSARTx->CR1 |= tempreg;
 
 	// Set up USART_Baud
-	setBaudRate(pUSARTHandle, pUSARTHandle->USART_Config.USART_Baud);
+	USART_SetBaudRate(pUSARTHandle, pUSARTHandle->USART_Config.USART_Baud);
 
 	// Set up USART_NoOfStopBits
 	tempreg = 0;
