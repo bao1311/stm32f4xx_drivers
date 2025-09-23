@@ -28,11 +28,6 @@ void I2C_DeInit(I2C_RegDef_t* pI2Cx)
 	}
 }
 
-uint32_t RCC_GetPLLOutputClk()
-{
-	// Not mentioned inside the lecture
-	return 0;
-}
 void I2C_Init(I2C_Handle_t* pI2CHandle)
 {
 	uint32_t tempreg = 0;
