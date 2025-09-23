@@ -5,6 +5,30 @@
  *      Author: gphi1
  */
 #include "stm32f407xx_usart_driver.h"
+
+
+/*
+ * ******************************************
+ * @fn			- USART_SetBaudRate
+ *
+ * @brief 		- This function configure the
+ * BRR register so USART peripheral can get
+ * its desired baud rate
+ *
+ * @param[in]	- USART Handle pointer
+ * @param[in]	- Baud Rate value
+ *
+ * @return
+ * @Note:
+ * ******************************************
+ */
+void USART_SetBaudRate(USART_Handle_t* pUSARTHandle, uint32_t BaudRate)
+{
+	/*
+	 * In order to configure the Fraction and Mantissa of the BRR
+	 * register, we need to figure out the
+	 */
+}
 /******************************************
  * @fn			- USART_Init
  *
@@ -35,6 +59,7 @@ void USART_Init(USART_Handle_t* pUSARTHandle)
 	pUSARTHandle->pUSARTx->CR1 |= tempreg;
 
 	// Set up USART_Baud
+	setBaudRate(pUSARTHandle, pUSARTHandle->USART_Config.USART_Baud);
 
 	// Set up USART_NoOfStopBits
 	tempreg = 0;
