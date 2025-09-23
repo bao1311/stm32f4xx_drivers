@@ -49,14 +49,21 @@ void USART_SetBaudRate(USART_Handle_t* pUSARTHandle, uint32_t BaudRate)
 	uint32_t USARTDIV;
 	// OVER8 bit
 	uint8_t OVER8 = pUSARTHandle->pUSARTx->CR1 & (1 << USART_CR1_OVER8);
+	// tempreg for setting up BRR register
+	uint32_t tempreg = 0;
 	// Calculate USARTDIV
-
-	// Calculate Fraction part (F)
+	USARTDIV = 100 * PCLKx / (8 * (2 - OVER8) * BaudRate);
 
 	// Calculate Mantissa part (M)
-
+	M = USARTDIV / 100;
+	// Set up the Mantissa part of tempreg
+	tempreg |= (M << 4);
+	// Calculate Fraction part (F)
+	F = USARTDIV % 100;
+	// Set up the Fraction part of tempreg
+	tempreg |= F;
 	// Set up the BRR register
-
+	pUSARTHandle->pUSARTx->BRR = tempreg;
 }
 /******************************************
  * @fn			- USART_Init
