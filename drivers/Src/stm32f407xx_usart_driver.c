@@ -193,7 +193,54 @@ void USART_PeriClockControl(USART_RegDef_t* pUSARTx, uint8_t EnorDi)
 /*
  * Data send and receive (Blocking version)
  */
-void USART_MasterSendData(USART_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len, uint8_t SlaveAddr);
+void USART_MasterSendData(USART_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len, uint8_t SlaveAddr)
+{
+	while (Len > 0)
+	{
+		// Check if Transmit DR is empty
+		while (!USART_GetFlagStatus(pHandle->pUSARTx, USART_TXE_FLAG));
+
+		// 2 Cases for M Word bit: 8 or 9 bits
+		if (pHandle->USART_Config.USART_WordLength == USART_WORDLEN_8BITS)
+		{
+			/*
+			 * WORDLEN 8 BITS CASE
+			 */
+			pHandle->pUSARTx->DR = *pTxBuffer;
+			pTxBuffer++;
+		}
+		else if (pHandle->USART_Config.USART_WordLength == USART_WORDLEN_9BITS)
+		{
+			/*
+			 * WORDLEN 9 BITS CASE
+			 */
+
+			// Check for parity configuration
+			uint16_t *pValue;
+			// Loading 2 bytes into DR register and masking it
+			pValue = (uint16_t*) pTxBuffer;
+			pHandle->pUSARTx->DR = *pValue & (0x1FF);
+			if (pHandle->USART_Config.USART_ParityControl == USART_PARITY_DI)
+			{
+				// If Parity Enabled
+				// Data format: 9 bits of data
+				pTxBuffer++;
+				pTxBuffer++;
+			}
+			else
+			{
+				// Data format: 8 bits of data + 1 bit of Parity Control (given by hardware)
+				pTxBuffer++;
+
+			}
+
+		}
+
+		Len--;
+	}
+	// Wait until Transaction complete by checking TC bit in SR
+
+}
 void USART_MasterReceiveData(USART_Handle_t* pUSARTx, uint8_t* pRxBuffer, uint32_t Len, uint8_t SlaveAddr);
 
 

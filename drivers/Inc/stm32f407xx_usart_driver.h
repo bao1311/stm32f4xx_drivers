@@ -183,6 +183,12 @@ void USART_ManageAcking(USART_RegDef_t* pUSARTx, uint8_t EnorDi);
  */
 void USART_ApplicationEventCallback(USART_Handle_t* pHandle, uint8_t AppEv);
 
+/*
+ * USART Flag
+ */
+#define USART_TXE_FLAG 				(1 << 7)
+#define USART_RXNE_FLAG				(1 << 5)
+
 
 
 
