@@ -6,7 +6,7 @@
  */
 #include "stm32f407xx_usart_driver.h"
 #include "stm32f407xx_gpio_driver.h"
-//#include "stm32f407xx.h"
+#include "stm32f407xx.h"
 
 char *message = "Hello, I am Bao";
 USART_Handle_t USARTHandle;
@@ -26,8 +26,8 @@ void USART_GPIOInits()
 	GPIOHandle.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_ALTFN;
 	GPIOHandle.GPIO_PinConfig.GPIO_PinAltFunMode = 7;
 	GPIOHandle.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_2;
-	GPIOHandle.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_OD;
-	GPIOHandle.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_NO_PUPD;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_PP;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_PIN_PU;
 	GPIOHandle.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_HIGH;
 	GPIO_Init(&GPIOHandle);
 
@@ -37,7 +37,25 @@ void USART_GPIOInits()
 
 }
 //void USART_Init();
+void delay()
+{
+	for (int i = 0; i < 100000; ++i)
+	{
+		;
+	}
+}
 
+void GPIO_BtnInit()
+{
+	GPIOHandle.pGPIOx = GPIOA;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinAltFunMode = 0;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_IN;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinNumber = 0;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_OD;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_NO_PUPD;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_HIGH;
+	GPIO_Init(&GPIOHandle);
+}
 
 //void GPIO_Init();
 int main(void)
@@ -47,17 +65,25 @@ int main(void)
 
 	// USART configuration
 	USARTHandle.pUSARTx = USART2;
+	USARTHandle.USART_Config.USART_Baud = USART_STD_BAUD_115200;
+	USARTHandle.USART_Config.USART_HWFlowControl = USART_HW_FLOW_CTRL_NONE;
+	USARTHandle.USART_Config.USART_Mode = USART_MODE_TX;
+	USARTHandle.USART_Config.USART_NoOfStopBits = USART_STOPBITS_1;
+	USARTHandle.USART_Config.USART_ParityControl = USART_PARITY_DI;
+	USARTHandle.USART_Config.USART_WordLength = USART_WORDLEN_8BITS;
 	// USART Init
 	USART_Init(&USARTHandle);
 
+	USART_PeripheralControl(USART2, ENABLE);
 
-//	GPIO_BtnInit();
+
+	GPIO_BtnInit();
 
 	while (1)
 	{
-		while (!GPIO_ReadFromInputPin(GPIOA, 8));
-
-		USART_MasterSendData(pUSARTHandle, message, sizeof(message), SLAVE_ADDR);
+		while (!GPIO_ReadFromInputPin(GPIOA, 0));
+		delay();
+		USART_MasterSendData(&USARTHandle, message, strlen(message));
 	}
 
 

@@ -140,8 +140,8 @@ void USART_PeriClockControl(USART_RegDef_t* pUSARTx, uint8_t EnorDi);
 /*
  * Data send and receive (Blocking version)
  */
-void USART_MasterSendData(USART_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len, uint8_t SlaveAddr);
-void USART_MasterReceiveData(USART_Handle_t* pUSARTx, uint8_t* pRxBuffer, uint32_t Len, uint8_t SlaveAddr);
+void USART_MasterSendData(USART_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len);
+void USART_MasterReceiveData(USART_Handle_t* pUSARTx, uint8_t* pRxBuffer, uint32_t Len);
 
 
 /*

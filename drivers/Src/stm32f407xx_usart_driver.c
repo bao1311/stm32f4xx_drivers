@@ -59,7 +59,7 @@ void USART_SetBaudRate(USART_Handle_t* pUSARTHandle, uint32_t BaudRate)
 	// Set up the Mantissa part of tempreg
 	tempreg |= (M << 4);
 	// Calculate Fraction part (F)
-	F = USARTDIV % 100;
+	F = (16 * (USARTDIV%100) + 50) / 100;
 	// Set up the Fraction part of tempreg
 	tempreg |= F;
 	// Set up the BRR register
@@ -77,6 +77,7 @@ void USART_SetBaudRate(USART_Handle_t* pUSARTHandle, uint32_t BaudRate)
  */
 void USART_Init(USART_Handle_t* pUSARTHandle)
 {
+	USART_PeriClockControl(pUSARTHandle->pUSARTx, ENABLE);
 	uint32_t tempreg = 0;
 	// Set up USART_MODE
 	if (pUSARTHandle->USART_Config.USART_Mode == USART_MODE_TX)
@@ -254,7 +255,7 @@ void USART_PeriClockControl(USART_RegDef_t* pUSARTx, uint8_t EnorDi)
 /*
  * Data send and receive (Blocking version)
  */
-void USART_MasterSendData(USART_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len, uint8_t SlaveAddr)
+void USART_MasterSendData(USART_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len)
 {
 	while (Len > 0)
 	{
@@ -302,7 +303,7 @@ void USART_MasterSendData(USART_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t 
 	// Wait until Transaction complete by checking TC bit in SR
 
 }
-void USART_MasterReceiveData(USART_Handle_t* pUSARTx, uint8_t* pRxBuffer, uint32_t Len, uint8_t SlaveAddr);
+void USART_MasterReceiveData(USART_Handle_t* pUSARTx, uint8_t* pRxBuffer, uint32_t Len);
 
 
 /*
