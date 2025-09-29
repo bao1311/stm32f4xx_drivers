@@ -382,7 +382,47 @@ void USART_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi) //Cando
 
 	}
 }
-void USART_EV_IRQHandling(USART_Handle_t* pUSARTHandle);
+/*
+ * @fn						- USART_EV_IRQHandling
+ * @brief					- Interrupt Event Handler
+ *
+ * @param[in]				- USART_Handle_t
+ *
+ * @return					- None
+ */
+void USART_EV_IRQHandling(USART_Handle_t* pUSARTHandle)
+{
+	uint32_t temp1, temp2, temp3;
+
+	/* TXE Interrupt */
+	// Check for TXE and TXEIE bit
+	// TXE
+	temp1 = (pUSARTHandle->pUSARTx->SR >> USART_SR_TXE) & 1;
+	temp2 = (pUSARTHandle->pUSARTx->CR1 >> USART_CR1_TXEIE) & 1;
+	if (temp1 & temp2)
+	{
+		// this interrupt is because of TXE
+
+	}
+	/* CTS Interrupt */
+	// Check for CTSIF and CTSIE bit
+	temp1 = (pUSARTHandle->pUSARTx->SR >> USART_SR_CTS);
+	temp2 = (pUSARTHandle->pUSARTx->CR1 >> USART_CR1_CTSIE);
+	/* Transmission Complete Interrupt */
+	// Check for TC and TCIE bit
+	/* Received Data Ready to be Read Interrupt */
+	// RXNE, RXNEIE
+	/* Overrun Error Detected Interrupt */
+	// ORE, RXNEIE
+	/* Idle Line Detected Interrupt */
+	// Check for IDLE and IDLEIE bit
+	/* Parity Error Interrupt */
+	// Check for PE and PEIE bit
+	/* Break Flag Interrupt */
+	// Check for LBD and LBDIE bit
+	/* Multibuffer Communication Type Interrupt */
+
+}
 
 /*
  * Other Peripheral Control APIs
