@@ -9,10 +9,18 @@
 #include "stm32f407xx_usart_driver.h"
 #include "stm32f407xx.h"
 #include "stm32f407xx_gpio_driver.h"
+#include <string.h>
 
 USART_Handle_t USARTHandle;
 GPIO_Handle_t GPIOHandle;
 char message[][50] = {"I am Bao", "I learn embedded system", "how are you"};
+void delay()
+{
+	for (int i = 0; i < 1000000; i++)
+	{
+		;
+	}
+}
 int main()
 {
 	USART2_GPIOInits();
@@ -23,8 +31,11 @@ int main()
 	while (1)
 	{
 		while (GPIO_ReadFromInputPin(GPIOA, 0));
+		delay();
 
-		while (USART_MasterReceiveDataIT(&USARTHandle, message, strlen(message)));
+		while (USART_MasterReceiveDataIT(&USARTHandle, message[0], strlen(message[0])));
+
+		USART_MasterSendData(&USARTHandle, message[0], strlen(message[0]));
 	}
 
 }
