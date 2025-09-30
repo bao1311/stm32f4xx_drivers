@@ -49,10 +49,21 @@ void USART2_GPIOInits()
 	GPIOHandle.GPIO_PinConfig.GPIO_PinNumber = 3;
 	GPIO_Init(&GPIOHandle);
 }
-void USART_PeripheralControl(USART2, ENABLE);
-void USART_PeriClockControl(USART2, ENABLE);
 
-void GPIOBtn_Init();
+void GPIOBtn_Init()
+{
+	GPIOHandle.pGPIOx = GPIOA;
+
+	GPIOHandle.GPIO_PinConfig.GPIO_PinAltFunMode = 0;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_IN;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinNumber = 0;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_OD;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_NO_PUPD;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
+
+	GPIO_Init(&GPIOHandle);
+
+}
 int main()
 {
 	USART2_GPIOInits();
