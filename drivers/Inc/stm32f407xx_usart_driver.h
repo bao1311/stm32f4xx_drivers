@@ -86,6 +86,11 @@ typedef struct
 {
 	USART_RegDef_t* pUSARTx;
 	USART_Config_t USART_Config;
+	uint8_t* TxBuffer;
+	uint8_t* RxBuffer;
+	uint32_t TxLen;
+	uint32_t RxLen;
+	uint8_t TxRxState;
 }USART_Handle_t;
 
 /*
