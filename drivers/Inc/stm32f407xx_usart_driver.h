@@ -147,8 +147,8 @@ void USART_MasterReceiveData(USART_Handle_t* pUSARTx, uint8_t* pRxBuffer, uint32
 /*
  * Data send and receive (Interrupt version)
  */
-uint8_t USART_MasterSendDataIT(USART_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len, uint8_t SlaveAddr, uint8_t Sr);
-uint8_t USART_MasterReceiveDataIT(USART_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len, uint8_t SlaveAddr, uint8_t Sr);
+uint8_t USART_MasterSendDataIT(USART_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len);
+uint8_t USART_MasterReceiveDataIT(USART_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len);
 
 /*
  * Data send and receive close communication
