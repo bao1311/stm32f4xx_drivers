@@ -21,9 +21,35 @@ void delay()
 		;
 	}
 }
+void USART2_Init()
+{
+	USARTHandle.pUSARTx = USART2;
+	USARTHandle.USART_Config.USART_Baud = 115200;
+	USARTHandle.USART_Config.USART_HWFlowControl = USART_HW_FLOW_CTRL_NONE;
+	USARTHandle.USART_Config.USART_Mode = USART_MODE_TXRX;
+	USARTHandle.USART_Config.USART_NoOfStopBits = USART_STOPBITS_1;
+	USARTHandle.USART_Config.USART_ParityControl = USART_PARITY_DI;
+	USARTHandle.USART_Config.USART_WordLength = USART_WORDLEN_8BITS;
+	USART_Init(&USARTHandle);
+
+}
+void USART2_GPIOInits()
+{
+	// Common declaration
+	GPIOHandle.pGPIOx = GPIOA;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinAltFunMode = GPIO_MODE_ALTFN;
+//	GPIOHandle
+	// PA2
+	// PA3
+}
+void USART_PeripheralControl(USART2, ENABLE);
+void USART_PeriClockControl(USART2, ENABLE);
+
+void GPIOBtn_Init();
 int main()
 {
 	USART2_GPIOInits();
+	USART2_Init();
 	USART_PeripheralControl(USART2, ENABLE);
 	USART_PeriClockControl(USART2, ENABLE);
 
