@@ -402,6 +402,7 @@ void USART_EV_IRQHandling(USART_Handle_t* pUSARTHandle)
 	if (temp1 & temp2)
 	{
 		// this interrupt is because of TXE
+		if (pUSARTHandle->Tx)
 
 	}
 	/* CTS Interrupt */
