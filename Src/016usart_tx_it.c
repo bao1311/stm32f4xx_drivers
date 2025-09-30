@@ -14,6 +14,7 @@
 USART_Handle_t USARTHandle;
 GPIO_Handle_t GPIOHandle;
 char message[][50] = {"I am Bao", "I learn embedded system", "how are you"};
+char* rcv_buf = "";
 void delay()
 {
 	for (int i = 0; i < 1000000; i++)
@@ -64,6 +65,10 @@ void GPIOBtn_Init()
 	GPIO_Init(&GPIOHandle);
 
 }
+void USART2_IRQHandler(void)
+{
+	return USART_EV_IRQHandling(&USARTHandle);
+}
 int main()
 {
 	USART2_GPIOInits();
@@ -74,10 +79,11 @@ int main()
 	GPIOBtn_Init();
 	while (1)
 	{
-		while (GPIO_ReadFromInputPin(GPIOA, 0));
+		while (!GPIO_ReadFromInputPin(GPIOA, 0));
+		// For debouncing
 		delay();
 
-		while (USART_MasterReceiveDataIT(&USARTHandle, message[0], strlen(message[0])));
+		while (USART_MasterReceiveDataIT(&USARTHandle, rcv_buf, strlen(message[0])) != USART_READY);
 
 		USART_MasterSendData(&USARTHandle, message[0], strlen(message[0]));
 	}

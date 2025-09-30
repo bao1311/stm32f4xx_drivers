@@ -310,7 +310,21 @@ void USART_MasterReceiveData(USART_Handle_t* pUSARTx, uint8_t* pRxBuffer, uint32
  * Data send and receive (Interrupt version)
  */
 uint8_t USART_MasterSendDataIT(USART_Handle_t* pHandle, uint8_t* pTxBuffer, uint32_t Len);
-uint8_t USART_MasterReceiveDataIT(USART_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len);
+uint8_t USART_MasterReceiveDataIT(USART_Handle_t* pHandle, uint8_t* pRxBuffer, uint32_t Len)
+{
+	// Set up status if not the interrupt mode yet
+	if (pHandle->TxRxState != USART_BUSY_IN_RX)
+	{
+		pHandle->TxRxState = USART_BUSY_IN_RX;
+		pHandle->RxBuffer = pRxBuffer;
+		pHandle->RxLen = Len;
+		// Erase data inside DR
+		(void)pHandle->pUSARTx->DR;
+		// Enable RX interrupt
+		pHandle->pUSARTx->CR1 |= (1 << USART_CR1_RXNEIE);
+	}
+	return USART_READY;
+}
 
 /*
  * Data send and receive close communication
@@ -408,11 +422,61 @@ void USART_EV_IRQHandling(USART_Handle_t* pUSARTHandle)
 	/* CTS Interrupt */
 	// Check for CTSIF and CTSIE bit
 	temp1 = (pUSARTHandle->pUSARTx->SR >> USART_SR_CTS);
-	temp2 = (pUSARTHandle->pUSARTx->CR1 >> USART_CR1_CTSIE);
+	temp2 = (pUSARTHandle->pUSARTx->CR1 >> USART_CR3_CTSIE);
 	/* Transmission Complete Interrupt */
 	// Check for TC and TCIE bit
 	/* Received Data Ready to be Read Interrupt */
 	// RXNE, RXNEIE
+	temp1 = pUSARTHandle->pUSARTx->SR & (1 << USART_SR_RXNE);
+	temp2 = pUSARTHandle->pUSARTx->CR1 & (1 << USART_CR1_RXNEIE);
+	if (temp1 && temp2)
+	{
+		if (pUSARTHandle->TxRxState == USART_BUSY_IN_RX)
+		{
+			if (pUSARTHandle->RxLen > 0)
+			{
+				// 2 case: Word Len = 8 bits or 9 bits
+				if (pUSARTHandle->USART_Config.USART_WordLength == USART_WORDLEN_8BITS)
+				{
+					// WORD_LEN = 8 BITS
+					if (pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_DI)
+					{
+						// No PARITY CONTROL
+						pUSARTHandle->RxBuffer = pUSARTHandle->pUSARTx->DR;
+						pUSARTHandle->RxBuffer++;
+						pUSARTHandle->RxLen--;
+					}
+					else
+					{
+						// PARITY CONTROL
+						pUSARTHandle->RxBuffer = (pUSARTHandle->pUSARTx->DR & (0x7F));
+						pUSARTHandle->RxBuffer++;
+						pUSARTHandle->RxLen--;
+					}
+				}
+				else
+				{
+					// WORD_LEN = 9 BITS
+					if (pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_DI)
+					{
+						// No PARITY CONTROL
+						pUSARTHandle->RxBuffer = pUSARTHandle->pUSARTx->DR;
+						pUSARTHandle->RxBuffer++;
+						pUSARTHandle->RxBuffer++;
+						pUSARTHandle->RxLen--;
+						pUSARTHandle->RxLen--;
+					}
+					else
+					{
+						// PARITY CONTROL
+						pUSARTHandle->RxBuffer = (pUSARTHandle->pUSARTx->DR & (0xFF));
+						pUSARTHandle->RxBuffer++;
+						pUSARTHandle->RxLen--;
+					}
+				}
+			}
+		}
+	}
 	/* Overrun Error Detected Interrupt */
 	// ORE, RXNEIE
 	/* Idle Line Detected Interrupt */
