@@ -37,10 +37,17 @@ void USART2_GPIOInits()
 {
 	// Common declaration
 	GPIOHandle.pGPIOx = GPIOA;
-	GPIOHandle.GPIO_PinConfig.GPIO_PinAltFunMode = GPIO_MODE_ALTFN;
-//	GPIOHandle
+	GPIOHandle.GPIO_PinConfig.GPIO_PinAltFunMode = 7;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_ALTFN;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_PP;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_PIN_PU;
+	GPIOHandle.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
 	// PA2
+	GPIOHandle.GPIO_PinConfig.GPIO_PinNumber = 2;
+	GPIO_Init(&GPIOHandle);
 	// PA3
+	GPIOHandle.GPIO_PinConfig.GPIO_PinNumber = 3;
+	GPIO_Init(&GPIOHandle);
 }
 void USART_PeripheralControl(USART2, ENABLE);
 void USART_PeriClockControl(USART2, ENABLE);
